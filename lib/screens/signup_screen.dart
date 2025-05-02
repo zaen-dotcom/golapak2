@@ -56,7 +56,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           );
         });
       } else {
-        // Jika gagal
+        setState(() => isLoading = false);
         _showAlert('Error', response['message'], 'OK', () {
           Navigator.of(context).pop();
         });
@@ -165,6 +165,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         if (!RegExp(
                           r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$",
                         ).hasMatch(value)) {
+                          setState(() => isLoading = false);
                           return 'Format email tidak valid';
                         }
                         return null;
@@ -180,6 +181,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           return 'Nomor telepon harus diisi';
                         }
                         if (!RegExp(r'^08\d{8,11}$').hasMatch(value)) {
+                          setState(() => isLoading = false);
                           return 'Format nomor telepon tidak valid';
                         }
                         return null;

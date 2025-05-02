@@ -20,28 +20,88 @@ class _MainNavigationState extends State<MainNavigation> {
   ];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (_selectedIndex != index) {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.receipt_long),
-            label: 'Pesanan',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
-        ],
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0.0, 0.1),
+              end: Offset.zero,
+            ).animate(animation),
+            child: FadeTransition(opacity: animation, child: child),
+          );
+        },
+        child: IndexedStack(
+          key: ValueKey<int>(_selectedIndex),
+          index: _selectedIndex,
+          children: _pages,
+        ),
+      ),
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          selectedItemColor: Theme.of(context).colorScheme.primary,
+          unselectedItemColor: Colors.grey,
+          showUnselectedLabels: true,
+          items: List.generate(3, (index) {
+            final isSelected = _selectedIndex == index;
+            IconData iconData;
+            String label;
+
+            switch (index) {
+              case 0:
+                iconData = Icons.home;
+                label = 'Home';
+                break;
+              case 1:
+                iconData = Icons.receipt_long;
+                label = 'Pesanan';
+                break;
+              default:
+                iconData = Icons.person;
+                label = 'Profil';
+            }
+
+            return BottomNavigationBarItem(
+              label: label,
+              icon: TweenAnimationBuilder<double>(
+                tween: Tween<double>(
+                  begin: isSelected ? 1.0 : 0.9,
+                  end: isSelected ? 1.2 : 1.0,
+                ),
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOut,
+                builder:
+                    (context, value, child) => Transform.scale(
+                      scale: value,
+                      child: Icon(
+                        iconData,
+                        color:
+                            isSelected
+                                ? Theme.of(context).colorScheme.primary
+                                : Colors.grey,
+                      ),
+                    ),
+              ),
+            );
+          }),
+        ),
       ),
     );
   }
