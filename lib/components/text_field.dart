@@ -5,6 +5,7 @@ class CustomTextField extends StatefulWidget {
   final String hintText;
   final bool isPassword;
   final TextEditingController? controller;
+  final String? Function(String?)? validator;
 
   const CustomTextField({
     Key? key,
@@ -12,6 +13,7 @@ class CustomTextField extends StatefulWidget {
     required this.hintText,
     this.isPassword = false,
     this.controller,
+    this.validator, // Tambahkan validator
   }) : super(key: key);
 
   @override
@@ -19,11 +21,11 @@ class CustomTextField extends StatefulWidget {
 }
 
 class _CustomTextFieldState extends State<CustomTextField> {
-  bool _obscureText = true; // Menyembunyikan password secara default
+  bool _obscureText = true;
 
   void _togglePasswordVisibility() {
     setState(() {
-      _obscureText = !_obscureText; // Toggle show/hide password
+      _obscureText = !_obscureText;
     });
   }
 
@@ -40,9 +42,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
           ),
         ),
         const SizedBox(height: 8),
-        TextField(
+        TextFormField(
           controller: widget.controller,
           obscureText: widget.isPassword ? _obscureText : false,
+          validator: widget.validator, // Pakai validator di sini
           decoration: InputDecoration(
             hintText: widget.hintText,
             filled: true,

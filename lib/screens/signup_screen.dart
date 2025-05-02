@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../components/button.dart';
 import '../components/text_field.dart';
+import '../services/auth_service.dart';
+import '../components/alertdialog.dart';
+import 'login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -16,13 +19,67 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _retypePasswordController =
       TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
 
-  void _signUp() {
+  void _signUp() async {
     if (_formKey.currentState!.validate()) {
-      print("Nama: \${_nameController.text}");
-      print("Email: \${_emailController.text}");
-      print("Password: \${_passwordController.text}");
+      // Ambil data dari text controller
+      String name = _nameController.text;
+      String email = _emailController.text;
+      String password = _passwordController.text;
+      String retypePassword = _retypePasswordController.text;
+      String phoneNumber = _phoneNumberController.text;
+
+      if (password != retypePassword) {
+        // Jika password dan konfirmasi tidak cocok
+        _showAlert('Peringatan', 'Password tidak cocok', 'OK', () {
+          Navigator.of(context).pop();
+        });
+        return;
+      }
+
+      final response = await register(name, email, phoneNumber, password);
+
+      if (response['status'] == 'success') {
+        // Jika berhasil
+        _showAlert('Sukses', response['message'], 'OK', () {
+          Navigator.of(context).pushReplacement(
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => LoginScreen(),
+              transitionsBuilder: (_, animation, __, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              transitionDuration: Duration(milliseconds: 500),
+            ),
+          );
+        });
+      } else {
+        // Jika gagal
+        _showAlert('Error', response['message'], 'Coba Lagi', () {
+          Navigator.of(context).pop();
+        });
+      }
     }
+  }
+
+  void _showAlert(
+    String title,
+    String message,
+    String confirmText,
+    VoidCallback onConfirm,
+  ) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return CustomAlert(
+          title: title,
+          message: message,
+          confirmText: confirmText,
+          onConfirm: onConfirm,
+        );
+      },
+    );
   }
 
   @override
@@ -89,12 +146,44 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       label: "Nama",
                       hintText: "Masukan nama anda",
                       controller: _nameController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Nama harus diisi';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 15),
                     CustomTextField(
                       label: "Email",
                       hintText: "example@gmail.com",
                       controller: _emailController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Email harus diisi';
+                        }
+                        if (!RegExp(
+                          r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$",
+                        ).hasMatch(value)) {
+                          return 'Format email tidak valid';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 15),
+                    CustomTextField(
+                      label: "Nomor Telepon",
+                      hintText: "08xxxxxxxxxx",
+                      controller: _phoneNumberController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Nomor telepon harus diisi';
+                        }
+                        if (!RegExp(r'^08\d{8,11}$').hasMatch(value)) {
+                          return 'Format nomor telepon tidak valid';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 15),
                     CustomTextField(
@@ -102,6 +191,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       hintText: "Kata sandi",
                       isPassword: true,
                       controller: _passwordController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Password harus diisi';
+                        }
+                        if (value.length < 8) {
+                          return 'Password minimal 8 karakter';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 15),
                     CustomTextField(
@@ -109,6 +207,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       hintText: "Konfirmasi kata sandi",
                       isPassword: true,
                       controller: _retypePasswordController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Konfirmasi password harus diisi';
+                        }
+                        if (value != _passwordController.text) {
+                          return 'Password tidak cocok';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 35),
                     CustomButton(text: "SIGN UP", onPressed: _signUp),

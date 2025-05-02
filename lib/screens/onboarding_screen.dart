@@ -102,11 +102,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 // **Animasi Slide dan Fade**
                 SlideTransition(
                   position: Tween<Offset>(
-                    begin: const Offset(1.0, 0.0), // Dari kanan ke kiri
+                    begin: const Offset(1.0, 0.0),
                     end: Offset.zero,
-                  ).animate(
-                    curvedAnimation,
-                  ), // Menggunakan animasi lebih smooth
+                  ).animate(curvedAnimation),
                   child: FadeTransition(opacity: curvedAnimation, child: child),
                 ),
               ],

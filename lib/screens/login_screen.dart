@@ -64,7 +64,6 @@ class LoginScreen extends StatelessWidget {
 
                   const SizedBox(height: 20),
 
-                  // Form Password
                   const CustomTextField(
                     label: "Password",
                     hintText: "●●●●●●●●",
@@ -73,7 +72,6 @@ class LoginScreen extends StatelessWidget {
 
                   const SizedBox(height: 10),
 
-                  // Remember Me & Forgot Password
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -123,7 +121,7 @@ class LoginScreen extends StatelessWidget {
                                                 ),
                                               ),
                                             ),
-                                            // Animasi Slide dengan Fade
+
                                             SlideTransition(
                                               position: Tween<Offset>(
                                                 begin: const Offset(
@@ -150,17 +148,19 @@ class LoginScreen extends StatelessWidget {
 
                   const SizedBox(height: 20),
 
-                  // Tombol Login
                   CustomButton(
                     text: "LOG IN",
                     onPressed: () {
-                      print("Login button pressed");
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/main',
+                        (route) => false,
+                      );
                     },
                   ),
 
                   const SizedBox(height: 20),
 
-                  // Sign Up Text (Hanya teks "Daftar" yang bisa diklik)
                   Center(
                     child: RichText(
                       text: TextSpan(
@@ -206,13 +206,10 @@ class LoginScreen extends StatelessWidget {
                                                       .withOpacity(0.1),
                                                 ),
                                               ),
-                                              // Animasi Slide dengan Fade
+
                                               SlideTransition(
                                                 position: Tween<Offset>(
-                                                  begin: const Offset(
-                                                    1.0,
-                                                    0.0,
-                                                  ), // Dari kanan ke kiri
+                                                  begin: const Offset(1.0, 0.0),
                                                   end: Offset.zero,
                                                 ).animate(animation),
                                                 child: FadeTransition(

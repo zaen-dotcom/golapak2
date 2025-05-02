@@ -3,6 +3,7 @@ import 'screens/onboarding_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/forgot_screen.dart';
+import 'routes/main_navigation.dart';
 import 'theme/theme.dart';
 
 void main() {
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/forgot': (context) => ForgotPasswordScreen(),
+        '/main': (context) => const MainNavigation(),
       },
     );
   }
