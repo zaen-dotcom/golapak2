@@ -30,6 +30,19 @@ Future<Map<String, dynamic>> register(
       };
     } else {
       final Map<String, dynamic> responseData = json.decode(response.body);
+
+      // Menangani error berdasarkan validasi
+      if (responseData.containsKey('errors')) {
+        final errors = responseData['errors'];
+        if (errors.containsKey('email')) {
+          return {'status': 'error', 'message': 'Email telah digunakan'};
+        } else if (errors.containsKey('phone_number')) {
+          return {
+            'status': 'error',
+            'message': 'Nomor handphone telah digunakan',
+          };
+        }
+      }
       return {
         'status': 'error',
         'message':

@@ -21,9 +21,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
 
+  bool isLoading = false;
+
   void _signUp() async {
     if (_formKey.currentState!.validate()) {
-      // Ambil data dari text controller
+      setState(() => isLoading = true);
       String name = _nameController.text;
       String email = _emailController.text;
       String password = _passwordController.text;
@@ -31,7 +33,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       String phoneNumber = _phoneNumberController.text;
 
       if (password != retypePassword) {
-        // Jika password dan konfirmasi tidak cocok
+        setState(() => isLoading = false);
         _showAlert('Peringatan', 'Password tidak cocok', 'OK', () {
           Navigator.of(context).pop();
         });
@@ -55,7 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         });
       } else {
         // Jika gagal
-        _showAlert('Error', response['message'], 'Coba Lagi', () {
+        _showAlert('Error', response['message'], 'OK', () {
           Navigator.of(context).pop();
         });
       }
@@ -218,7 +220,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       },
                     ),
                     const SizedBox(height: 35),
-                    CustomButton(text: "SIGN UP", onPressed: _signUp),
+                    CustomButton(
+                      text: "Sign Up",
+                      onPressed: _signUp,
+                      isLoading: isLoading,
+                    ),
                   ],
                 ),
               ),

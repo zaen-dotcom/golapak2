@@ -1,14 +1,74 @@
 import 'dart:ui';
-import 'package:flutter/gestures.dart'; // Tambahkan import ini
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:golapak2/theme/colors.dart';
 import '../components/button.dart';
 import '../components/text_field.dart';
 import 'signup_screen.dart';
 import 'forgot_screen.dart';
+import '../services/auth_service.dart';
+import '../components/alertdialog.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  bool isLoading = false;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  void _handleLogin() async {
+    if (isLoading) return;
+
+    setState(() => isLoading = true);
+
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      setState(() => isLoading = false);
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return CustomAlert(
+            title: 'Error',
+            message: 'Email dan Password tidak boleh kosong.',
+            confirmText: 'OK',
+            onConfirm: () {
+              Navigator.of(context).pop();
+            },
+          );
+        },
+      );
+      return;
+    }
+
+    final response = await login(email, password);
+    setState(() => isLoading = false);
+    if (response['status'] == 'success') {
+      Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
+    } else {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return CustomAlert(
+            title: 'Gagal',
+            message: response['message'] ?? 'Email atau password salah.',
+            confirmText: 'OK',
+            onConfirm: () {
+              Navigator.of(context).pop();
+            },
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,22 +116,19 @@ class LoginScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Form Email
-                  const CustomTextField(
+                  CustomTextField(
                     label: "Email",
                     hintText: "example@gmail.com",
+                    controller: _emailController,
                   ),
-
                   const SizedBox(height: 20),
-
-                  const CustomTextField(
+                  CustomTextField(
                     label: "Password",
                     hintText: "●●●●●●●●",
                     isPassword: true,
+                    controller: _passwordController,
                   ),
-
                   const SizedBox(height: 10),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -109,7 +166,6 @@ class LoginScreen extends StatelessWidget {
                                       ) {
                                         return Stack(
                                           children: [
-                                            // Layer Blur
                                             BackdropFilter(
                                               filter: ImageFilter.blur(
                                                 sigmaX: 10.0,
@@ -121,13 +177,9 @@ class LoginScreen extends StatelessWidget {
                                                 ),
                                               ),
                                             ),
-
                                             SlideTransition(
                                               position: Tween<Offset>(
-                                                begin: const Offset(
-                                                  1.0,
-                                                  0.0,
-                                                ), // Dari kanan ke kiri
+                                                begin: const Offset(1.0, 0.0),
                                                 end: Offset.zero,
                                               ).animate(animation),
                                               child: FadeTransition(
@@ -145,22 +197,14 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 20),
-
                   CustomButton(
                     text: "LOG IN",
-                    onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        '/main',
-                        (route) => false,
-                      );
-                    },
+                    onPressed: isLoading ? null : _handleLogin,
+                    isLoading: isLoading,
                   ),
 
                   const SizedBox(height: 20),
-
                   Center(
                     child: RichText(
                       text: TextSpan(
@@ -174,7 +218,6 @@ class LoginScreen extends StatelessWidget {
                             recognizer:
                                 TapGestureRecognizer()
                                   ..onTap = () {
-                                    print("Teks 'Daftar' ditekan");
                                     Navigator.push(
                                       context,
                                       PageRouteBuilder(
@@ -195,7 +238,6 @@ class LoginScreen extends StatelessWidget {
                                         ) {
                                           return Stack(
                                             children: [
-                                              // Layer Blur
                                               BackdropFilter(
                                                 filter: ImageFilter.blur(
                                                   sigmaX: 10.0,
@@ -206,7 +248,6 @@ class LoginScreen extends StatelessWidget {
                                                       .withOpacity(0.1),
                                                 ),
                                               ),
-
                                               SlideTransition(
                                                 position: Tween<Offset>(
                                                   begin: const Offset(1.0, 0.0),
