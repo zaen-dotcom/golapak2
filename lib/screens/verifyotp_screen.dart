@@ -3,6 +3,8 @@ import '../components/text_field.dart';
 import '../components/button.dart';
 import '../theme/colors.dart';
 import '../components/alertdialog.dart';
+import '../services/auth_service.dart';
+import 'login_screen.dart';
 
 class VerifyOTPScreen extends StatefulWidget {
   final String email;
@@ -16,6 +18,7 @@ class VerifyOTPScreen extends StatefulWidget {
 class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
   final TextEditingController _otpController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool isButtonLoading = false;
 
   @override
   void dispose() {
@@ -24,24 +27,65 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
     super.dispose();
   }
 
-  void _handleVerify() {
+  Future<void> _showAlert(String title, String message) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (_) => CustomAlert(
+            title: title,
+            message: message,
+            confirmText: "OK",
+            onConfirm: () => Navigator.pop(context),
+          ),
+    );
+  }
+
+  void _handleVerify() async {
+    if (isButtonLoading) return;
+
     final otp = _otpController.text.trim();
     final password = _passwordController.text.trim();
-    if (otp.isEmpty || password.isEmpty) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder:
-            (_) => CustomAlert(
-              title: "Peringatan",
-              message: "OTP dan sandi baru tidak boleh kosong.",
-              confirmText: "OK",
-              onConfirm: () => Navigator.pop(context),
-            ),
-      );
 
+    if (otp.isEmpty || password.isEmpty) {
+      _showAlert("Peringatan", "OTP dan sandi baru tidak boleh kosong.");
       return;
     }
+
+    if (password.length < 8) {
+      _showAlert("Peringatan", "Sandi baru harus minimal 8 karakter.");
+      return;
+    }
+
+    setState(() {
+      isButtonLoading = true;
+    });
+
+    final result = await verifyResetPassword(
+      email: widget.email,
+      kodeOtp: otp,
+      newPassword: password,
+    );
+
+    if (result['status'] == 'success') {
+      _showAlert("Berhasil", result['message']).then((_) {
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => const LoginScreen(),
+            transitionsBuilder: (_, animation, __, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 500),
+          ),
+        );
+      });
+    } else {
+      _showAlert("Gagal", result['message']);
+    }
+
+    setState(() {
+      isButtonLoading = false;
+    });
   }
 
   @override
@@ -104,10 +148,9 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Email TextField yang hanya untuk tampilan, tidak bisa diedit
                   TextField(
                     controller: TextEditingController(text: widget.email),
-                    enabled: false, // Membuat textfield tidak bisa diedit
+                    enabled: false,
                     decoration: InputDecoration(
                       labelText: "Email",
                       hintText: "example@gmail.com",
@@ -131,7 +174,11 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
                     controller: _passwordController,
                   ),
                   const SizedBox(height: 24),
-                  CustomButton(text: "VERIFIKASI", onPressed: _handleVerify),
+                  CustomButton(
+                    text: "VERIFIKASI",
+                    onPressed: isButtonLoading ? null : _handleVerify,
+                    isLoading: isButtonLoading,
+                  ),
                 ],
               ),
             ),
