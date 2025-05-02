@@ -118,12 +118,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: Column(
                       children: [
                         Text(
-                          "Sign Up",
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                          "Daftar Akun",
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleLarge?.copyWith(color: Colors.white),
                         ),
                         const SizedBox(height: 5),
                         Text(

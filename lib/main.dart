@@ -4,6 +4,7 @@ import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/forgot_screen.dart';
 import 'routes/main_navigation.dart';
+import 'screens/verifyotp_screen.dart';
 import 'theme/theme.dart';
 
 void main() {
@@ -26,6 +27,15 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignUpScreen(),
         '/forgot': (context) => ForgotPasswordScreen(),
         '/main': (context) => const MainNavigation(),
+        '/otp': (context) {
+          final email = ModalRoute.of(context)?.settings.arguments as String?;
+          if (email == null) {
+            return const Scaffold(
+              body: Center(child: Text('Email is required')),
+            );
+          }
+          return VerifyOTPScreen(email: email);
+        },
       },
     );
   }
