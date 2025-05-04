@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../components/banner.dart';
+import '../components/banner.dart'; // Pastikan import BannerPlaceholder
 import '../routes/category_nav.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,6 +18,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final int _bannerCount = 3;
   int _currentBanner = 0;
+
+  final List<String> _bannerUrls = [
+    'images/Homepage_1.png',
+    'images/Homepage_2.png',
+    'images/Homepage_3.png',
+  ];
 
   @override
   void initState() {
@@ -111,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   // Banner
                   SizedBox(
-                    height: 180,
+                    height: 220,
                     child: PageView.builder(
                       controller: _pageController,
                       itemCount: _bannerCount,
@@ -121,7 +127,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (context, index) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: BannerPlaceholder(),
+                          child: BannerPlaceholder(
+                            imageUrl:
+                                _bannerUrls[index], // Menambahkan URL gambar
+                          ),
                         );
                       },
                     ),
@@ -136,7 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   const SizedBox(height: 15),
 
-                  // Hilangkan SizedBox, langsung panggil CategoryScreen
                   const CategoryScreen(),
                 ],
               ),

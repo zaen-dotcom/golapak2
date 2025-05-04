@@ -3,13 +3,19 @@ import 'package:flutter/material.dart';
 class CardProduct extends StatelessWidget {
   final String title;
   final String price;
-  final VoidCallback onAdd;
+  final String imageUrl;
+  final int quantity;
+  final VoidCallback onIncrement;
+  final VoidCallback onDecrement;
 
   const CardProduct({
     Key? key,
     required this.title,
     required this.price,
-    required this.onAdd,
+    required this.imageUrl,
+    required this.quantity,
+    required this.onIncrement,
+    required this.onDecrement,
   }) : super(key: key);
 
   @override
@@ -35,24 +41,38 @@ class CardProduct extends StatelessWidget {
       child: Stack(
         children: [
           Column(
-            mainAxisAlignment:
-                MainAxisAlignment.center, // Menyusun isi ke tengah vertikal
-            crossAxisAlignment:
-                CrossAxisAlignment.start, // Menyusun konten ke kiri horizontal
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                height: 90,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.blueGrey[200],
-                  borderRadius: BorderRadius.circular(15),
-                ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child:
+                    imageUrl.isNotEmpty
+                        ? Image.network(
+                          imageUrl,
+                          height: 90,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder:
+                              (context, error, stackTrace) => Container(
+                                height: 90,
+                                width: double.infinity,
+                                color: Colors.blueGrey[200],
+                                child: const Icon(Icons.broken_image, size: 40),
+                              ),
+                        )
+                        : Container(
+                          height: 90,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey[200],
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: const Icon(Icons.image, size: 40),
+                        ),
               ),
               const SizedBox(height: 12),
               Text(
                 truncatedTitle,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 15,
@@ -73,17 +93,63 @@ class CardProduct extends StatelessWidget {
           Positioned(
             bottom: 0,
             right: 0,
-            child: GestureDetector(
-              onTap: onAdd,
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.add, color: Colors.white, size: 18),
-              ),
-            ),
+            child:
+                quantity == 0
+                    ? GestureDetector(
+                      onTap: onIncrement,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                    )
+                    : Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: onDecrement,
+                            child: const Icon(
+                              Icons.remove,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            quantity.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          GestureDetector(
+                            onTap: onIncrement,
+                            child: const Icon(
+                              Icons.add,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
           ),
         ],
       ),
