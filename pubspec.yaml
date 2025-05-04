@@ -58,9 +58,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/
-    - assets/images/Homepage_1.png
-    - assets/images/Homepage_2.png
-    - assets/images/Homepage_3.png
+    - assets/images/
   fonts:
     - family: Sen
       fonts:

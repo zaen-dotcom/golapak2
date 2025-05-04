@@ -15,22 +15,22 @@ class _MinumanScreenState extends State<MinumanScreen> {
     {
       'title': 'Coca-Cola',
       'price': 'Rp. 5000',
-      'image': 'https://via.placeholder.com/150/FF0000/FFFFFF?text=Coca-Cola',
+      'image': 'assets/images/esteler.png',
     },
     {
       'title': 'Sprite',
       'price': 'Rp. 4000',
-      'image': 'https://via.placeholder.com/150/7FFF00/000000?text=Sprite',
+      'image': 'assets/images/bakso.jpg',
     },
     {
       'title': 'Pepsi',
       'price': 'Rp. 6000',
-      'image': 'https://via.placeholder.com/150/1E90FF/FFFFFF?text=Pepsi',
+      'image': 'assets/images/bakreng.jpg',
     },
     {
       'title': 'Fanta',
       'price': 'Rp. 4500',
-      'image': 'https://via.placeholder.com/150/FF69B4/000000?text=Fanta',
+      'image': 'assets/images/miepromo.png',
     },
   ];
 

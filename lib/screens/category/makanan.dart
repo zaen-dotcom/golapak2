@@ -15,26 +15,22 @@ class _MakananScreenState extends State<MakananScreen> {
     {
       'title': 'Burger Bistro',
       'price': 'Rp. 25000',
-      'image':
-          'https://via.placeholder.com/150/FFB6C1/000000?text=Burger+Bistro',
+      'image': 'assets/images/bakso.jpg',
     },
     {
       'title': 'Smokin\' Burger',
       'price': 'Rp. 10000',
-      'image':
-          'https://via.placeholder.com/150/90EE90/000000?text=Smokin+Burger',
+      'image': 'assets/images/bakreng.jpg',
     },
     {
       'title': 'Buffalo Burgers',
       'price': 'Rp. 13000',
-      'image':
-          'https://via.placeholder.com/150/87CEFA/000000?text=Buffalo+Burgers',
+      'image': 'assets/images/gorengan.jpeg',
     },
     {
       'title': 'Bullseye Burgers',
       'price': 'Rp. 14000',
-      'image':
-          'https://via.placeholder.com/150/FFD700/000000?text=Bullseye+Burgers',
+      'image': 'assets/images/miayam.jpg',
     },
   ];
 
@@ -56,6 +52,7 @@ class _MakananScreenState extends State<MakananScreen> {
           ),
           itemBuilder: (context, index) {
             final item = items[index];
+
             // Mengambil jumlah produk yang dipilih dari CartProvider
             final quantity = Provider.of<CartProvider>(
               context,

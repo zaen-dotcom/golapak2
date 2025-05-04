@@ -47,11 +47,13 @@ class CardProduct extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15),
                 child:
                     imageUrl.isNotEmpty
-                        ? Image.network(
+                        ? Image.asset(
                           imageUrl,
-                          height: 90,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
+                          height: 110, // Mengatur tinggi gambar
+                          width: double.infinity, // Membuat gambar lebar penuh
+                          fit:
+                              BoxFit
+                                  .cover, // Memastikan gambar mengisi area yang ada
                           errorBuilder:
                               (context, error, stackTrace) => Container(
                                 height: 110,
@@ -61,7 +63,7 @@ class CardProduct extends StatelessWidget {
                               ),
                         )
                         : Container(
-                          height: 90,
+                          height: 110,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             color: Colors.blueGrey[200],

@@ -32,18 +32,21 @@ class _CategoryScreenState extends State<CategoryScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TabBar(
-            controller: _tabController,
-            labelColor: Colors.black,
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: Theme.of(context).primaryColor,
-            tabs: const [Tab(text: 'Makanan'), Tab(text: 'Minuman')],
+          // DIBUNGKUS Material agar tidak ada shadow/garis
+          Material(
+            color: Colors.white, // background sesuai tema kamu
+            elevation: 0, // penting untuk hilangkan garis bawah
+            child: TabBar(
+              controller: _tabController,
+              labelColor: Colors.black,
+              unselectedLabelColor: Colors.grey,
+              indicatorColor: Theme.of(context).primaryColor,
+              tabs: const [Tab(text: 'Makanan'), Tab(text: 'Minuman')],
+            ),
           ),
           const SizedBox(height: 8),
           SizedBox(
-            height:
-                MediaQuery.of(context).size.height *
-                0.8, // atau sesuaikan lebih fleksibel
+            height: MediaQuery.of(context).size.height * 0.8,
             child: TabBarView(
               controller: _tabController,
               children: const [MakananScreen(), MinumanScreen()],

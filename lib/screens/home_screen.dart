@@ -17,16 +17,16 @@ class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  final PageController _pageController = PageController(viewportFraction: 0.9);
+  final PageController _pageController = PageController(viewportFraction: 1.0);
   Timer? _bannerTimer;
 
   final int _bannerCount = 3;
   int _currentBanner = 0;
 
   final List<String> _bannerUrls = [
-    'images/Homepage_1.png',
-    'images/Homepage_2.png',
-    'images/Homepage_3.png',
+    'assets/images/Homepage_1.png',
+    'assets/images/Homepage_2.png',
+    'assets/images/Homepage_3.png',
   ];
 
   @override
@@ -70,54 +70,67 @@ class _HomeScreenState extends State<HomeScreen>
           SafeArea(
             child: GestureDetector(
               onTap: () => _focusNode.unfocus(),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Search Bar
-                    Container(
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(12),
+              child: CustomScrollView(
+                slivers: [
+                  // Search Bar
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.search, color: Colors.black45),
-                          Expanded(
-                            child: TextField(
-                              controller: _searchController,
-                              focusNode: _focusNode,
-                              decoration: InputDecoration(
-                                hintText: "Cari...",
-                                hintStyle: const TextStyle(
-                                  color: Colors.black38,
+                      child: Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.search, color: Colors.black45),
+                            Expanded(
+                              child: TextField(
+                                controller: _searchController,
+                                focusNode: _focusNode,
+                                decoration: InputDecoration(
+                                  hintText: "Cari...",
+                                  hintStyle: const TextStyle(
+                                    color: Colors.black38,
+                                  ),
+                                  border: InputBorder.none,
+                                  fillColor: Colors.grey[200],
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[200]!,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[200]!,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
-                                border: InputBorder.none,
-                                fillColor: Colors.grey[200],
-                                filled: true,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                ),
+                                autofocus: false,
+                                style: const TextStyle(color: Colors.black),
                               ),
-                              autofocus: false,
-                              style: const TextStyle(color: Colors.black),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: 20),
-
-                    // Banner
-                    SizedBox(
-                      height: 220,
+                  // Banner
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.3,
                       child: PageView.builder(
                         controller: _pageController,
                         itemCount: _bannerCount,
@@ -136,26 +149,30 @@ class _HomeScreenState extends State<HomeScreen>
                         },
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: 20),
+                  const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
-                    const Text(
-                      'Kategori Menu',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                  // Kategori Menu
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        'Kategori Menu',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: 15),
+                  const SliverToBoxAdapter(child: SizedBox(height: 15)),
 
-                    const CategoryScreen(),
+                  const SliverToBoxAdapter(child: CategoryScreen()),
 
-                    const SizedBox(
-                      height: 100,
-                    ), // Spacer agar konten tidak tertutup tombol
-                  ],
-                ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                ],
               ),
             ),
           ),
@@ -164,9 +181,7 @@ class _HomeScreenState extends State<HomeScreen>
           Positioned(
             left: 20,
             right: 20,
-            bottom:
-                MediaQuery.of(context).padding.bottom +
-                12, // Lebih dekat ke navbot
+            bottom: MediaQuery.of(context).padding.bottom + 12,
             child: AnimatedSlide(
               offset: cartProvider.totalItems > 0 ? Offset(0, 0) : Offset(0, 1),
               duration: const Duration(milliseconds: 300),
