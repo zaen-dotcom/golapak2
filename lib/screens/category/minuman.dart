@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../components/cardproduct.dart';
+import '../../cart/cart_provider.dart';
 
 class MinumanScreen extends StatefulWidget {
   const MinumanScreen({Key? key}) : super(key: key);
@@ -32,15 +34,6 @@ class _MinumanScreenState extends State<MinumanScreen> {
     },
   ];
 
-  // Menyimpan quantity masing-masing produk
-  late List<int> quantities;
-
-  @override
-  void initState() {
-    super.initState();
-    quantities = List<int>.filled(items.length, 0);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,7 +52,10 @@ class _MinumanScreenState extends State<MinumanScreen> {
           ),
           itemBuilder: (context, index) {
             final item = items[index];
-            final quantity = quantities[index];
+            // Mengambil jumlah produk yang dipilih dari CartProvider
+            final quantity = Provider.of<CartProvider>(
+              context,
+            ).getQuantity(item['title']!);
 
             return CardProduct(
               title: item['title']!,
@@ -67,16 +63,18 @@ class _MinumanScreenState extends State<MinumanScreen> {
               imageUrl: item['image']!,
               quantity: quantity,
               onIncrement: () {
-                setState(() {
-                  quantities[index]++;
-                });
+                // Menambahkan item ke CartProvider
+                Provider.of<CartProvider>(
+                  context,
+                  listen: false,
+                ).addItem(item['title']!);
               },
               onDecrement: () {
-                setState(() {
-                  if (quantities[index] > 0) {
-                    quantities[index]--;
-                  }
-                });
+                // Mengurangi item dari CartProvider
+                Provider.of<CartProvider>(
+                  context,
+                  listen: false,
+                ).removeItem(item['title']!);
               },
             );
           },

@@ -54,7 +54,7 @@ class CardProduct extends StatelessWidget {
                           fit: BoxFit.cover,
                           errorBuilder:
                               (context, error, stackTrace) => Container(
-                                height: 90,
+                                height: 110,
                                 width: double.infinity,
                                 color: Colors.blueGrey[200],
                                 child: const Icon(Icons.broken_image, size: 40),
