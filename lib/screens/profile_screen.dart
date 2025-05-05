@@ -6,24 +6,52 @@ import 'profile/alamat.dart';
 import 'profile/keranjang.dart';
 import 'profile/help.dart';
 import 'profile/pengaturan.dart';
+import '../services/auth_service.dart';
+import '../utils/token_manager.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
 
-  void _onLogout(BuildContext context) {
+  void _onLogout(BuildContext context) async {
+    // Tampilkan dialog konfirmasi logout
     showDialog(
       context: context,
+      barrierDismissible: false, // Mencegah dialog ditutup selain dengan tombol
       builder:
           (_) => CustomAlert(
             title: 'Keluar',
             message: 'Yakin ingin keluar dari akun ini?',
             confirmText: 'OK',
-            onConfirm: () {
-              Navigator.of(context).popUntil((route) => route.isFirst);
+            onConfirm: () async {
+              final token =
+                  await TokenManager.getToken(); // Ambil token dari SharedPreferences
+
+              if (token == null) {
+                // Jika token tidak ada di SharedPreferences, langsung arahkan ke halaman login
+                Navigator.pushReplacementNamed(context, '/login');
+              } else {
+                // Jika token ada, lanjutkan dengan proses logout
+                final result =
+                    await logout(); // Proses logout dari API atau state
+
+                if (result['status'] == 'success') {
+                  // Jika logout berhasil, hapus token dari SharedPreferences
+                  await TokenManager.removeToken();
+
+                  // Arahkan langsung ke halaman login
+                  Navigator.pushReplacementNamed(context, '/login');
+                } else {
+                  // Jika logout gagal, tampilkan pesan error
+                  Navigator.pop(context); // Tutup dialog
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(result['message'])));
+                }
+              }
             },
             cancelText: 'Batal',
             onCancel: () {
-              Navigator.pop(context);
+              Navigator.pop(context); // Tutup dialog jika batal
             },
           ),
     );
@@ -70,7 +98,6 @@ class ProfileScreen extends StatelessWidget {
                   );
                 },
               ),
-
               const SizedBox(height: 5),
               MenuItem(
                 icon: Icons.location_on_outlined,

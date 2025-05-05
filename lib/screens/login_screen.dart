@@ -8,6 +8,7 @@ import 'signup_screen.dart';
 import 'forgot_screen.dart';
 import '../services/auth_service.dart';
 import '../components/alertdialog.dart';
+import '../utils/token_manager.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -18,6 +19,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool isLoading = false;
+  bool rememberMe = false;
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -36,7 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
         barrierDismissible: false,
         builder: (context) {
           return CustomAlert(
-            title: 'Error',
+            title: 'Gagal',
             message: 'Email dan Password tidak boleh kosong.',
             confirmText: 'OK',
             onConfirm: () {
@@ -51,6 +54,10 @@ class _LoginScreenState extends State<LoginScreen> {
     final response = await login(email, password);
     setState(() => isLoading = false);
     if (response['status'] == 'success') {
+      if (rememberMe) {
+        // Simpan token jika checkbox dicentang
+        await TokenManager.saveToken(response['access_token']);
+      }
       Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
     } else {
       showDialog(
@@ -134,10 +141,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       Row(
                         children: [
-                          Checkbox(value: false, onChanged: (value) {}),
+                          Checkbox(
+                            value: rememberMe,
+                            onChanged: (value) {
+                              setState(() {
+                                rememberMe = value ?? false;
+                              });
+                            },
+                          ),
                           const Text("Ingat saya"),
                         ],
                       ),
+
                       RichText(
                         text: TextSpan(
                           text: "Lupa Sandi",

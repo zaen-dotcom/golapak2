@@ -6,6 +6,8 @@ import '../components/button.dart';
 import '../routes/category_nav.dart';
 import '../cart/cart_provider.dart';
 import '../theme/colors.dart';
+import 'dart:ui';
+import '../screens/profile/help.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -60,6 +62,35 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
+  void _navigateToHelpScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 300),
+        pageBuilder: (context, animation, secondaryAnimation) => HelpScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return Stack(
+            children: [
+              // Efek blur untuk background
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                child: Container(color: Colors.black.withOpacity(0.1)),
+              ),
+              // Animasi slide dari kanan + fade
+              SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: FadeTransition(opacity: animation, child: child),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
@@ -79,59 +110,118 @@ class _HomeScreenState extends State<HomeScreen>
                         horizontal: 20,
                         vertical: 12,
                       ),
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: AppColors.lightGreyBlue, // <-- GANTI DI SINI
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.search,
-                              color: Color(
-                                0xFF607D8B,
-                              ), // atau sesuaikan jika punya warna icon sendiri
-                            ),
-                            Expanded(
-                              child: TextField(
-                                controller: _searchController,
-                                focusNode: _focusNode,
-                                decoration: InputDecoration(
-                                  hintText: "Cari...",
-                                  hintStyle: const TextStyle(
-                                    color: Color(0xFF90A4AE),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: AppColors.lightGreyBlue,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    spreadRadius: 2,
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
                                   ),
-                                  border: InputBorder.none,
-                                  filled: true,
-                                  fillColor:
-                                      AppColors
-                                          .lightGreyBlue, // <-- GANTI DI SINI JUGA
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
+                                ],
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.search,
+                                    color:
+                                        Colors
+                                            .black, // Ubah warna ikon menjadi hitam
+                                    size: 22,
                                   ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color:
-                                          AppColors
-                                              .lightGreyBlue, // <-- DAN DI SINI
+
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: TextField(
+                                      controller: _searchController,
+                                      focusNode: _focusNode,
+                                      decoration: InputDecoration(
+                                        hintText:
+                                            "Cari...", // More descriptive hint
+                                        hintStyle: const TextStyle(
+                                          color:
+                                              Colors
+                                                  .black, // Ubah warna hint text menjadi hitam
+                                          fontSize: 14,
+                                        ),
+
+                                        border: InputBorder.none,
+                                        filled: true,
+                                        fillColor: Colors.transparent,
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                              vertical:
+                                                  12, // Added vertical padding
+                                              horizontal: 8,
+                                            ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide
+                                                  .none, // Changed to none
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                            color: Color(0xFFB0BEC5),
+                                            width:
+                                                1.2, // Slightly thicker border when focused
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                      ),
+                                      autofocus: false,
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14, // Consistent font size
+                                      ),
                                     ),
-                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Color(0xFFB0BEC5), // Biru-abu tua
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                autofocus: false,
-                                style: const TextStyle(color: Colors.black),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(width: 10),
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1E1F38),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(
+                                    0.1,
+                                  ), // 10% opacity
+                                  spreadRadius: 1, // Penyebaran sedang
+                                  blurRadius: 2, // Blur sedang
+                                  offset: const Offset(0, 4), // 2px ke bawah
+                                ),
+                              ],
+                            ),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.support_agent_rounded,
+                                color: Colors.white,
+                                size: 26,
+                              ),
+                              onPressed: () => _navigateToHelpScreen(context),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -171,6 +261,7 @@ class _HomeScreenState extends State<HomeScreen>
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: Colors.black,
                         ),
                       ),
                     ),
@@ -186,13 +277,12 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
 
-          // Animated Keranjang Button
           Positioned(
             left: 20,
             right: 20,
             bottom: MediaQuery.of(context).padding.bottom + 12,
             child: AnimatedSlide(
-              offset: cartProvider.totalItems > 0 ? Offset(0, 0) : Offset(0, 1),
+              offset: cartProvider.totalItems > 0 ? Offset.zero : Offset(0, 1),
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
               child: AnimatedOpacity(

@@ -5,6 +5,7 @@ import '../components/button.dart';
 import '../components/dot_indicator.dart';
 import '../theme/colors.dart';
 import '../screens/login_screen.dart';
+import '../utils/token_manager.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
@@ -35,6 +36,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
+    _checkToken();
 
     // Preload gambar onboarding1 agar langsung muncul
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -60,6 +62,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  void _checkToken() async {
+    final token = await TokenManager.getToken();
+    if (token != null && token.isNotEmpty) {
+      Navigator.pushReplacementNamed(context, '/main');
+    }
   }
 
   void _nextPage() {
