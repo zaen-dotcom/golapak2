@@ -150,6 +150,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         if (value == null || value.isEmpty) {
                           return 'Nama harus diisi';
                         }
+                        if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            _showAlert(
+                              'Peringatan',
+                              'Nama hanya boleh berisi huruf',
+                              'OK',
+                              () {
+                                Navigator.of(context).pop();
+                              },
+                            );
+                          });
+                          return 'Format nama tidak valid';
+                        }
                         return null;
                       },
                     ),
