@@ -5,6 +5,7 @@ import '../components/banner.dart';
 import '../components/button.dart';
 import '../routes/category_nav.dart';
 import '../cart/cart_provider.dart';
+import '../theme/colors.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -72,7 +73,6 @@ class _HomeScreenState extends State<HomeScreen>
               onTap: () => _focusNode.unfocus(),
               child: CustomScrollView(
                 slivers: [
-                  // Search Bar
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -82,13 +82,18 @@ class _HomeScreenState extends State<HomeScreen>
                       child: Container(
                         height: 50,
                         decoration: BoxDecoration(
-                          color: Colors.grey[200],
+                          color: AppColors.lightGreyBlue, // <-- GANTI DI SINI
                           borderRadius: BorderRadius.circular(12),
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Row(
                           children: [
-                            const Icon(Icons.search, color: Colors.black45),
+                            const Icon(
+                              Icons.search,
+                              color: Color(
+                                0xFF607D8B,
+                              ), // atau sesuaikan jika punya warna icon sendiri
+                            ),
                             Expanded(
                               child: TextField(
                                 controller: _searchController,
@@ -96,23 +101,27 @@ class _HomeScreenState extends State<HomeScreen>
                                 decoration: InputDecoration(
                                   hintText: "Cari...",
                                   hintStyle: const TextStyle(
-                                    color: Colors.black38,
+                                    color: Color(0xFF90A4AE),
                                   ),
                                   border: InputBorder.none,
-                                  fillColor: Colors.grey[200],
                                   filled: true,
+                                  fillColor:
+                                      AppColors
+                                          .lightGreyBlue, // <-- GANTI DI SINI JUGA
                                   contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 8,
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Colors.grey[200]!,
+                                      color:
+                                          AppColors
+                                              .lightGreyBlue, // <-- DAN DI SINI
                                     ),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Colors.grey[200]!,
+                                    borderSide: const BorderSide(
+                                      color: Color(0xFFB0BEC5), // Biru-abu tua
                                     ),
                                     borderRadius: BorderRadius.circular(12),
                                   ),

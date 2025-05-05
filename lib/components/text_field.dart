@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/colors.dart'; // Pastikan mengimpor AppColors
 
 class CustomTextField extends StatefulWidget {
   final String label;
@@ -13,7 +14,7 @@ class CustomTextField extends StatefulWidget {
     required this.hintText,
     this.isPassword = false,
     this.controller,
-    this.validator, // Tambahkan validator
+    this.validator,
   }) : super(key: key);
 
   @override
@@ -38,18 +39,18 @@ class _CustomTextFieldState extends State<CustomTextField> {
           widget.label.toUpperCase(),
           style: const TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.black54,
+            color: Color(0xFF607D8B), // Warna biru keabu-abuan
           ),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: widget.controller,
           obscureText: widget.isPassword ? _obscureText : false,
-          validator: widget.validator, // Pakai validator di sini
+          validator: widget.validator,
           decoration: InputDecoration(
             hintText: widget.hintText,
             filled: true,
-            fillColor: Colors.grey[100],
+            fillColor: AppColors.lightGreyBlue, // Ganti dengan lightGreyBlue
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide.none,
@@ -59,7 +60,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     ? IconButton(
                       icon: Icon(
                         _obscureText ? Icons.visibility_off : Icons.visibility,
-                        color: Colors.grey,
+                        color: Color(0xFF607D8B), // Warna ikon biru keabu-abuan
                       ),
                       onPressed: _togglePasswordVisibility,
                     )

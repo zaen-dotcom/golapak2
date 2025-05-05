@@ -32,8 +32,8 @@ class CardProduct extends StatelessWidget {
         boxShadow: const [
           BoxShadow(
             color: Color(0x1A000000),
-            blurRadius: 0.5,
-            spreadRadius: 0,
+            blurRadius: 3,
+            spreadRadius: 1,
             offset: Offset(0, 2),
           ),
         ],
@@ -49,11 +49,9 @@ class CardProduct extends StatelessWidget {
                     imageUrl.isNotEmpty
                         ? Image.asset(
                           imageUrl,
-                          height: 110, // Mengatur tinggi gambar
-                          width: double.infinity, // Membuat gambar lebar penuh
-                          fit:
-                              BoxFit
-                                  .cover, // Memastikan gambar mengisi area yang ada
+                          height: 110,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
                           errorBuilder:
                               (context, error, stackTrace) => Container(
                                 height: 110,
