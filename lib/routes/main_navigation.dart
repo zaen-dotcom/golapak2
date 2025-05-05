@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../screens/home_screen.dart';
 import '../screens/pesanan_screen.dart';
 import '../screens/profile_screen.dart';
+import '../screens/profile/chat/ai_screen.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -101,6 +102,60 @@ class _MainNavigationState extends State<MainNavigation> {
               ),
             );
           }),
+        ),
+      ),
+
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 20.0), // angkat ke atas sedikit
+        child: GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+              PageRouteBuilder(
+                transitionDuration: const Duration(milliseconds: 500),
+                pageBuilder: (_, __, ___) => const AIScreen(),
+                transitionsBuilder: (_, animation, __, child) {
+                  final curvedAnimation = CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOut,
+                  );
+                  return SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(1.0, 1.0), // dari pojok kanan bawah
+                      end: Offset.zero,
+                    ).animate(curvedAnimation),
+                    child: FadeTransition(
+                      opacity: curvedAnimation,
+                      child: child,
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+          child: Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1F38),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.25),
+                  blurRadius: 6,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            alignment: Alignment.center,
+            child: const Text(
+              'AI',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ),
       ),
     );

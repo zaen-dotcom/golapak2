@@ -199,23 +199,13 @@ class _HomeScreenState extends State<HomeScreen>
                             width: 50,
                             height: 50,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF1E1F38),
+                              color: AppColors.lightGreyBlue,
                               borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(
-                                    0.1,
-                                  ), // 10% opacity
-                                  spreadRadius: 1, // Penyebaran sedang
-                                  blurRadius: 2, // Blur sedang
-                                  offset: const Offset(0, 4), // 2px ke bawah
-                                ),
-                              ],
                             ),
                             child: IconButton(
                               icon: const Icon(
                                 Icons.support_agent_rounded,
-                                color: Colors.white,
+                                color: Colors.black, // Ikon tetap hitam
                                 size: 26,
                               ),
                               onPressed: () => _navigateToHelpScreen(context),
