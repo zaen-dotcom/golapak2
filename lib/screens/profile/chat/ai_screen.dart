@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
 import '../../../theme/colors.dart';
-import '../../../services/deepseek_service.dart';
+import '../../../services/gemini_service.dart';
 import '../../../models/ai_model.dart';
 
 class AIScreen extends StatefulWidget {
@@ -12,7 +12,7 @@ class AIScreen extends StatefulWidget {
 }
 
 class _AIScreenState extends State<AIScreen> with TickerProviderStateMixin {
-  late final DeepSeekService _deepSeekService;
+  late final GeminiService _deepSeekService;
   late AnimationController _waveController;
   late Animation<double> _waveAnimation;
   final TextEditingController _textController = TextEditingController();
@@ -23,8 +23,8 @@ class _AIScreenState extends State<AIScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _deepSeekService = DeepSeekService(
-      apiKey: 'sk-469967709dbd4a2685ea0c9ac7cd6ab7',
+    _deepSeekService = GeminiService(
+      apiKey: 'AIzaSyCS7DvYPoeZazCUx-Kl12UAs_WazYm7Hb0',
     );
 
     _waveController = AnimationController(
@@ -54,32 +54,36 @@ class _AIScreenState extends State<AIScreen> with TickerProviderStateMixin {
   }
 
   void _addMessage({required String message, required bool isUser}) {
+    final msg = ChatMessage(
+      text: message,
+      isUser: isUser,
+      animationController: AnimationController(
+        duration: const Duration(milliseconds: 300),
+        vsync: this,
+      ),
+    );
+
     setState(() {
-      _messages.add(
-        ChatMessage(
-          text: message,
-          isUser: isUser,
-          animationController: AnimationController(
-            duration: const Duration(milliseconds: 300),
-            vsync: this,
-          ),
-        ),
-      );
-      _messages.last.animationController.forward();
+      _messages.add(msg);
     });
-    _scrollToBottom();
+
+    msg.animationController.forward().then((_) {
+      // Scroll after animation completes
+      _scrollToBottom();
+    });
   }
 
   void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
+    if (_scrollController.hasClients) {
+      // Add a small delay to ensure the widget is built
+      Future.delayed(const Duration(milliseconds: 50), () {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
-      }
-    });
+      });
+    }
   }
 
   Future<void> _sendMessage() async {
@@ -94,7 +98,6 @@ class _AIScreenState extends State<AIScreen> with TickerProviderStateMixin {
 
     try {
       final response = await _deepSeekService.sendChat(chatHistory: _messages);
-
       _addMessage(message: response, isUser: false);
     } catch (e) {
       _addMessage(
@@ -133,12 +136,18 @@ class _AIScreenState extends State<AIScreen> with TickerProviderStateMixin {
           Column(
             children: [
               Expanded(
-                child: ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _messages.length,
-                  itemBuilder:
-                      (context, index) => _buildMessage(_messages[index]),
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (notification) {
+                    // Keep track of scroll position if needed
+                    return false;
+                  },
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _messages.length,
+                    itemBuilder:
+                        (context, index) => _buildMessage(_messages[index]),
+                  ),
                 ),
               ),
               if (_isLoading)
