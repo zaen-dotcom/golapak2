@@ -32,53 +32,61 @@ class _MakananScreenState extends State<MakananScreen> {
       'price': 'Rp. 14000',
       'image': 'assets/images/miayam.jpg',
     },
+    // Bisa menambahkan lebih banyak item sesuai kebutuhan
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Makanan')),
-      body: Padding(
-        padding: const EdgeInsets.all(0),
-        child: GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: items.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 2,
-            mainAxisSpacing: 2,
-            childAspectRatio: 2 / 2.8,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(0),
+        child: AppBar(backgroundColor: Colors.transparent, elevation: 0),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: GridView.builder(
+              shrinkWrap:
+                  true, // Ini memungkinkan GridView menyesuaikan tinggi kontennya
+              physics:
+                  const NeverScrollableScrollPhysics(), // Agar scroll hanya di GridView utama
+              itemCount: items.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio:
+                    2 / 2.8, // Sesuaikan agar gambar dan teks seimbang
+              ),
+              itemBuilder: (context, index) {
+                final item = items[index];
+
+                final quantity = Provider.of<CartProvider>(
+                  context,
+                ).getQuantity(item['title']!);
+
+                return CardProduct(
+                  title: item['title']!,
+                  price: item['price']!,
+                  imageUrl: item['image']!,
+                  quantity: quantity,
+                  onIncrement: () {
+                    Provider.of<CartProvider>(
+                      context,
+                      listen: false,
+                    ).addItem(item['title']!);
+                  },
+                  onDecrement: () {
+                    Provider.of<CartProvider>(
+                      context,
+                      listen: false,
+                    ).removeItem(item['title']!);
+                  },
+                );
+              },
+            ),
           ),
-          itemBuilder: (context, index) {
-            final item = items[index];
-
-            // Mengambil jumlah produk yang dipilih dari CartProvider
-            final quantity = Provider.of<CartProvider>(
-              context,
-            ).getQuantity(item['title']!);
-
-            return CardProduct(
-              title: item['title']!,
-              price: item['price']!,
-              imageUrl: item['image']!,
-              quantity: quantity,
-              onIncrement: () {
-                // Menambahkan item ke CartProvider
-                Provider.of<CartProvider>(
-                  context,
-                  listen: false,
-                ).addItem(item['title']!);
-              },
-              onDecrement: () {
-                // Mengurangi item dari CartProvider
-                Provider.of<CartProvider>(
-                  context,
-                  listen: false,
-                ).removeItem(item['title']!);
-              },
-            );
-          },
         ),
       ),
     );

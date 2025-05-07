@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../screens/home_screen.dart';
-import '../screens/pesanan_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/profile/chat/ai_screen.dart';
+import '../routes/order_navigation.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -16,7 +16,7 @@ class _MainNavigationState extends State<MainNavigation> {
 
   final List<Widget> _pages = const [
     HomeScreen(),
-    PesananScreen(),
+    OrderNavigation(), // ganti dari PesananScreen ke OrderNavigation
     ProfileScreen(),
   ];
 
@@ -104,9 +104,8 @@ class _MainNavigationState extends State<MainNavigation> {
           }),
         ),
       ),
-
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 20.0), // angkat ke atas sedikit
+        padding: const EdgeInsets.only(bottom: 20.0),
         child: GestureDetector(
           onTap: () {
             Navigator.of(context).push(
@@ -120,7 +119,7 @@ class _MainNavigationState extends State<MainNavigation> {
                   );
                   return SlideTransition(
                     position: Tween<Offset>(
-                      begin: const Offset(1.0, 1.0), // dari pojok kanan bawah
+                      begin: const Offset(1.0, 1.0),
                       end: Offset.zero,
                     ).animate(curvedAnimation),
                     child: FadeTransition(

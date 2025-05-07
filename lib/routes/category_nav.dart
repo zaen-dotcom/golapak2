@@ -35,13 +35,39 @@ class _CategoryScreenState extends State<CategoryScreen>
           // DIBUNGKUS Material agar tidak ada shadow/garis
           Material(
             color: Colors.white, // background sesuai tema kamu
-            elevation: 0, // penting untuk hilangkan garis bawah
-            child: TabBar(
-              controller: _tabController,
-              labelColor: Colors.black,
-              unselectedLabelColor: Colors.grey,
-              indicatorColor: Theme.of(context).primaryColor,
-              tabs: const [Tab(text: 'Makanan'), Tab(text: 'Minuman')],
+            elevation: 0, // hilangkan garis bawah
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 2,
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              child: TabBar(
+                controller: _tabController,
+                dividerColor: Colors.transparent,
+                indicator: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                ),
+                indicatorPadding: const EdgeInsets.all(6),
+                indicatorSize: TabBarIndicatorSize.tab,
+                labelColor: Theme.of(context).colorScheme.primary,
+                unselectedLabelColor: Colors.grey[600],
+                labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+                unselectedLabelStyle: Theme.of(context).textTheme.bodyLarge,
+                tabs: const [Tab(text: 'Makanan'), Tab(text: 'Minuman')],
+              ),
             ),
           ),
           const SizedBox(height: 8),

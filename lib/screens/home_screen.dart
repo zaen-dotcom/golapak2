@@ -8,6 +8,7 @@ import '../cart/cart_provider.dart';
 import '../theme/colors.dart';
 import 'dart:ui';
 import '../screens/profile/help.dart';
+import '../components/dot_indicator.dart'; // Import untuk DotIndicator
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -134,40 +135,30 @@ class _HomeScreenState extends State<HomeScreen>
                                 children: [
                                   const Icon(
                                     Icons.search,
-                                    color:
-                                        Colors
-                                            .black, // Ubah warna ikon menjadi hitam
+                                    color: Colors.black,
                                     size: 22,
                                   ),
-
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: TextField(
                                       controller: _searchController,
                                       focusNode: _focusNode,
                                       decoration: InputDecoration(
-                                        hintText:
-                                            "Cari...", // More descriptive hint
+                                        hintText: "Cari...",
                                         hintStyle: const TextStyle(
-                                          color:
-                                              Colors
-                                                  .black, // Ubah warna hint text menjadi hitam
+                                          color: Colors.black,
                                           fontSize: 14,
                                         ),
-
                                         border: InputBorder.none,
                                         filled: true,
                                         fillColor: Colors.transparent,
                                         contentPadding:
                                             const EdgeInsets.symmetric(
-                                              vertical:
-                                                  12, // Added vertical padding
+                                              vertical: 12,
                                               horizontal: 8,
                                             ),
                                         enabledBorder: OutlineInputBorder(
-                                          borderSide:
-                                              BorderSide
-                                                  .none, // Changed to none
+                                          borderSide: BorderSide.none,
                                           borderRadius: BorderRadius.circular(
                                             12,
                                           ),
@@ -175,18 +166,12 @@ class _HomeScreenState extends State<HomeScreen>
                                         focusedBorder: OutlineInputBorder(
                                           borderSide: const BorderSide(
                                             color: Color(0xFFB0BEC5),
-                                            width:
-                                                1.2, // Slightly thicker border when focused
+                                            width: 1.2,
                                           ),
                                           borderRadius: BorderRadius.circular(
                                             12,
                                           ),
                                         ),
-                                      ),
-                                      autofocus: false,
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14, // Consistent font size
                                       ),
                                     ),
                                   ),
@@ -205,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen>
                             child: IconButton(
                               icon: const Icon(
                                 Icons.support_agent_rounded,
-                                color: Colors.black, // Ikon tetap hitam
+                                color: Colors.black,
                                 size: 26,
                               ),
                               onPressed: () => _navigateToHelpScreen(context),
@@ -224,7 +209,9 @@ class _HomeScreenState extends State<HomeScreen>
                         controller: _pageController,
                         itemCount: _bannerCount,
                         onPageChanged: (index) {
-                          _currentBanner = index;
+                          setState(() {
+                            _currentBanner = index;
+                          });
                         },
                         itemBuilder: (context, index) {
                           return Padding(
@@ -237,6 +224,14 @@ class _HomeScreenState extends State<HomeScreen>
                           );
                         },
                       ),
+                    ),
+                  ),
+
+                  // Dot Indicator for Banner
+                  SliverToBoxAdapter(
+                    child: DotIndicator(
+                      currentIndex: _currentBanner,
+                      dotCount: _bannerCount,
                     ),
                   ),
 
