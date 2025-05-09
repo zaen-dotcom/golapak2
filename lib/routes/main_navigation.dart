@@ -145,14 +145,22 @@ class _MainNavigationState extends State<MainNavigation> {
                 ),
               ],
             ),
-            alignment: Alignment.center,
-            child: const Text(
-              'AI',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                const Icon(Icons.chat_bubble, color: Colors.white, size: 28),
+                Transform.translate(
+                  offset: const Offset(0, -3),
+                  child: const Text(
+                    'AI',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

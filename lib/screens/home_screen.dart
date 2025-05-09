@@ -8,7 +8,7 @@ import '../cart/cart_provider.dart';
 import '../theme/colors.dart';
 import 'dart:ui';
 import '../screens/profile/help.dart';
-import '../components/dot_indicator.dart'; // Import untuk DotIndicator
+import '../components/dot_indicator.dart'; 
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
