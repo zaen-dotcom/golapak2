@@ -6,43 +6,71 @@ import 'profile/alamat.dart';
 import 'profile/keranjang.dart';
 import 'profile/help.dart';
 import 'profile/pengaturan.dart';
+import '../services/user_service.dart';
 import '../services/auth_service.dart';
 import '../utils/token_manager.dart';
+import '../models/user_model.dart';
+import 'package:shimmer/shimmer.dart';
+import '../providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  UserModel? _user;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final user = await getUser();
+
+      // Set user ke state
+      setState(() {
+        _user = user;
+      });
+
+      if (user != null) {
+        Provider.of<UserProvider>(context, listen: false).setUserId(user.id);
+      }
+    } catch (e) {
+      setState(() {
+        _user = null;
+      });
+    }
+  }
+
   void _onLogout(BuildContext context) async {
-    // Tampilkan dialog konfirmasi logout
     showDialog(
       context: context,
-      barrierDismissible: false, // Mencegah dialog ditutup selain dengan tombol
+      barrierDismissible: false,
       builder:
           (_) => CustomAlert(
             title: 'Keluar',
             message: 'Yakin ingin keluar dari akun ini?',
             confirmText: 'OK',
             onConfirm: () async {
-              final token =
-                  await TokenManager.getToken(); // Ambil token dari SharedPreferences
+              final token = await TokenManager.getToken();
 
               if (token == null) {
-                // Jika token tidak ada di SharedPreferences, langsung arahkan ke halaman login
                 Navigator.pushReplacementNamed(context, '/login');
               } else {
-                // Jika token ada, lanjutkan dengan proses logout
-                final result =
-                    await logout(); // Proses logout dari API atau state
+                final result = await logout();
 
                 if (result['status'] == 'success') {
-                  // Jika logout berhasil, hapus token dari SharedPreferences
                   await TokenManager.removeToken();
-
-                  // Arahkan langsung ke halaman login
                   Navigator.pushReplacementNamed(context, '/login');
                 } else {
-                  // Jika logout gagal, tampilkan pesan error
-                  Navigator.pop(context); // Tutup dialog
+                  Navigator.pop(context);
                   ScaffoldMessenger.of(
                     context,
                   ).showSnackBar(SnackBar(content: Text(result['message'])));
@@ -51,7 +79,7 @@ class ProfileScreen extends StatelessWidget {
             },
             cancelText: 'Batal',
             onCancel: () {
-              Navigator.pop(context); // Tutup dialog jika batal
+              Navigator.pop(context);
             },
           ),
     );
@@ -69,22 +97,46 @@ class ProfileScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 5),
               Center(
-                child: CircleAvatar(
-                  radius: 57,
-                  backgroundColor: Colors.orangeAccent,
-                  child: const Icon(
-                    Icons.person,
-                    size: 60,
-                    color: Colors.white,
-                  ),
-                ),
+                child:
+                    _user == null
+                        ? Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: CircleAvatar(
+                            radius: 57,
+                            backgroundColor: Colors.grey[300],
+                          ),
+                        )
+                        : CircleAvatar(
+                          radius: 57,
+                          backgroundColor: Colors.orangeAccent,
+                          child: const Icon(
+                            Icons.person,
+                            size: 60,
+                            color: Colors.white,
+                          ),
+                        ),
               ),
               const SizedBox(height: 20),
-              const Center(
-                child: Text(
-                  'Nama Pengguna',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
+              Center(
+                child:
+                    _user == null
+                        ? Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            height: 18,
+                            width: 100,
+                            color: Colors.grey[300],
+                          ),
+                        )
+                        : Text(
+                          _user!.name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
               ),
               const SizedBox(height: 50),
               MenuItem(

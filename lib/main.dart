@@ -6,7 +6,8 @@ import 'screens/signup_screen.dart';
 import 'screens/forgot_screen.dart';
 import 'routes/main_navigation.dart';
 import 'screens/verifyotp_screen.dart';
-import 'cart/cart_provider.dart';
+import 'providers/cart_provider.dart';
+import 'providers/user_provider.dart'; // <- tambahkan ini
 import 'screens/profile/keranjang.dart';
 import 'theme/theme.dart';
 
@@ -19,8 +20,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<CartProvider>(
-      create: (context) => CartProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<CartProvider>(create: (_) => CartProvider()),
+        ChangeNotifierProvider<UserProvider>(create: (_) => UserProvider()), 
+      ],
       child: MaterialApp(
         title: 'My App',
         debugShowCheckedModeBanner: false,

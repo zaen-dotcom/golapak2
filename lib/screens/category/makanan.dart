@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../components/cardproduct.dart';
-import '../../cart/cart_provider.dart';
+import '../../providers/cart_provider.dart';
 
 class MakananScreen extends StatefulWidget {
   const MakananScreen({Key? key}) : super(key: key);
