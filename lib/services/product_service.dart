@@ -1,0 +1,41 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../models/product_model.dart';
+import '../utils/token_manager.dart';
+import 'api_config.dart';
+
+Future<List<ProductModel>> fetchMakanan() async {
+  return _fetchProduk('/menu/makanan');
+}
+
+Future<List<ProductModel>> fetchMinuman() async {
+  return _fetchProduk('/menu/minuman');
+}
+
+Future<List<ProductModel>> _fetchProduk(String endpoint) async {
+  final url = '${ApiConfig.baseUrl}$endpoint';
+
+  try {
+    final token = await TokenManager.getToken();
+    if (token == null) {
+      throw Exception('Token tidak ditemukan. Pengguna belum login.');
+    }
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body)['data'];
+      return data.map((item) => ProductModel.fromJson(item)).toList();
+    } else {
+      throw Exception('Gagal mengambil data produk: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Kesalahan saat mengambil data: $e');
+  }
+}

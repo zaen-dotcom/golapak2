@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../components/cardproduct.dart';
 import '../../providers/cart_provider.dart';
+import '../../models/product_model.dart'; // Ganti dengan path ke foodModel
+import '../../services/product_service.dart'; // Pastikan fetchminuman dipindah ke service
 
 class MinumanScreen extends StatefulWidget {
   const MinumanScreen({Key? key}) : super(key: key);
@@ -11,29 +13,13 @@ class MinumanScreen extends StatefulWidget {
 }
 
 class _MinumanScreenState extends State<MinumanScreen> {
-  final List<Map<String, String>> items = [
-    {
-      'title': 'Coca-Cola',
-      'price': 'Rp. 5000',
-      'image': 'assets/images/esteler.png',
-    },
-    {
-      'title': 'Sprite',
-      'price': 'Rp. 4000',
-      'image': 'assets/images/bakso.jpg',
-    },
-    {
-      'title': 'Pepsi',
-      'price': 'Rp. 6000',
-      'image': 'assets/images/bakreng.jpg',
-    },
-    {
-      'title': 'Fanta',
-      'price': 'Rp. 4500',
-      'image': 'assets/images/miepromo.png',
-    },
-    // Bisa menambahkan lebih banyak item sesuai kebutuhan
-  ];
+  late Future<List<ProductModel>> minumanList;
+
+  @override
+  void initState() {
+    super.initState();
+    minumanList = fetchMinuman();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,49 +29,63 @@ class _MinumanScreenState extends State<MinumanScreen> {
         child: AppBar(backgroundColor: Colors.transparent, elevation: 0),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: GridView.builder(
-              shrinkWrap:
-                  true, // Agar GridView menyesuaikan dengan tinggi kontennya
-              physics:
-                  const NeverScrollableScrollPhysics(), // Agar hanya scroll utama yang aktif
-              itemCount: items.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-                childAspectRatio:
-                    2 / 2.8, // Sesuaikan agar gambar dan teks seimbang
-              ),
-              itemBuilder: (context, index) {
-                final item = items[index];
-                final quantity = Provider.of<CartProvider>(
-                  context,
-                ).getQuantity(item['title']!);
+        child: FutureBuilder<List<ProductModel>>(
+          future: minumanList,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text('Terjadi kesalahan: ${snapshot.error}'),
+              );
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('Tidak ada data minuman'));
+            } else {
+              final minumanList = snapshot.data!;
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: minumanList.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                          childAspectRatio: 2 / 2.8,
+                        ),
+                    itemBuilder: (context, index) {
+                      final minuman = minumanList[index];
+                      final quantity = Provider.of<CartProvider>(
+                        context,
+                      ).getQuantity(minuman.name);
 
-                return CardProduct(
-                  title: item['title']!,
-                  price: item['price']!,
-                  imageUrl: item['image']!,
-                  quantity: quantity,
-                  onIncrement: () {
-                    Provider.of<CartProvider>(
-                      context,
-                      listen: false,
-                    ).addItem(item['title']!);
-                  },
-                  onDecrement: () {
-                    Provider.of<CartProvider>(
-                      context,
-                      listen: false,
-                    ).removeItem(item['title']!);
-                  },
-                );
-              },
-            ),
-          ),
+                      return CardProduct(
+                        title: minuman.name,
+                        price: 'Rp. ${minuman.mainCost.toInt()}',
+                        imageUrl: minuman.image,
+                        quantity: quantity,
+                        onIncrement: () {
+                          Provider.of<CartProvider>(
+                            context,
+                            listen: false,
+                          ).addItem(minuman.name);
+                        },
+                        onDecrement: () {
+                          Provider.of<CartProvider>(
+                            context,
+                            listen: false,
+                          ).removeItem(minuman.name);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              );
+            }
+          },
         ),
       ),
     );
