@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class CardProduct extends StatelessWidget {
   final String title;
@@ -47,18 +48,34 @@ class CardProduct extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15),
                 child:
                     imageUrl.isNotEmpty
-                        ? Image.asset(
-                          imageUrl,
+                        ? SizedBox(
                           height: 110,
                           width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder:
-                              (context, error, stackTrace) => Container(
-                                height: 110,
-                                width: double.infinity,
-                                color: Colors.blueGrey[200],
-                                child: const Icon(Icons.broken_image, size: 40),
-                              ),
+                          child: CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            fit: BoxFit.cover,
+                            placeholder:
+                                (context, url) => Container(
+                                  color: Colors.grey[200],
+                                  alignment: Alignment.center,
+                                  child: const SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ),
+                            errorWidget:
+                                (context, url, error) => Container(
+                                  color: Colors.blueGrey[200],
+                                  alignment: Alignment.center,
+                                  child: const Icon(
+                                    Icons.broken_image,
+                                    size: 40,
+                                  ),
+                                ),
+                          ),
                         )
                         : Container(
                           height: 110,
