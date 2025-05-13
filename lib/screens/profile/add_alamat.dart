@@ -81,9 +81,9 @@ class _AddAlamatScreenState extends State<AddAlamatScreen> {
               message: result['message'] ?? 'Alamat berhasil ditambahkan',
               confirmText: 'OK',
               onConfirm: () {
-                Navigator.of(context).pop(); // Tutup alert
-                Navigator.of(context).pop(); // Kembali ke halaman sebelumnya
-                setState(() => _isLoading = false); // Stop loading
+                Navigator.of(context).pop(); 
+                Navigator.of(context).pop();
+                setState(() => _isLoading = false); 
               },
             ),
       );
@@ -98,7 +98,7 @@ class _AddAlamatScreenState extends State<AddAlamatScreen> {
               confirmText: 'OK',
               onConfirm: () {
                 Navigator.of(context).pop();
-                setState(() => _isLoading = false); // Stop loading
+                setState(() => _isLoading = false); 
               },
             ),
       );

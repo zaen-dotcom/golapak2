@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // Import provider
-import '../../providers/cart_provider.dart'; // Import CartProvider
+import 'package:provider/provider.dart'; 
+import '../../providers/cart_provider.dart'; 
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -37,7 +37,7 @@ class CartScreen extends StatelessWidget {
             title: Text(item),
             trailing: Text('Qty: ${cartProvider.items[item]}'),
             onTap: () {
-              // Optional: bisa menambah atau mengurangi produk di cart
+             
             },
           );
         },

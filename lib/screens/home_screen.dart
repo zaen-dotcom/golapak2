@@ -72,12 +72,12 @@ class _HomeScreenState extends State<HomeScreen>
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return Stack(
             children: [
-              // Efek blur untuk background
+            
               BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                 child: Container(color: Colors.black.withOpacity(0.1)),
               ),
-              // Animasi slide dari kanan + fade
+              
               SlideTransition(
                 position: Tween<Offset>(
                   begin: const Offset(1.0, 0.0),
@@ -227,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   ),
 
-                  // Dot Indicator for Banner
+                  
                   SliverToBoxAdapter(
                     child: DotIndicator(
                       currentIndex: _currentBanner,
@@ -237,7 +237,7 @@ class _HomeScreenState extends State<HomeScreen>
 
                   const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
-                  // Kategori Menu
+                 
                   const SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20),

@@ -15,7 +15,7 @@ class GeminiService {
     Duration timeout = const Duration(seconds: 30),
   }) async {
     try {
-      // Ambil hanya isi pesan, disusun sebagai parts[]
+
       final parts = chatHistory.map((msg) => {'text': msg.text}).toList();
 
       final body = {

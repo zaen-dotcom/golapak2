@@ -32,7 +32,6 @@ class _HelpScreenState extends State<HelpScreen> {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   final ScrollController _scrollController = ScrollController();
 
-  // Fungsi untuk menambahkan chat bubble dengan animasi
   void _insertChatBubble(Widget chatBubble) {
     chatWidgets.add(chatBubble);
     if (_listKey.currentState != null) {
@@ -62,7 +61,7 @@ class _HelpScreenState extends State<HelpScreen> {
       showBantuanQuestions = false;
     });
 
-    // Add user message
+
     _insertChatBubble(
       const ChatBubble(
         message: 'Kembali ke daftar kategori',
@@ -70,7 +69,7 @@ class _HelpScreenState extends State<HelpScreen> {
       ),
     );
 
-    // Add system response after delay
+
     Future.delayed(const Duration(seconds: 1), () {
       _insertChatBubble(
         const ChatBubble(
@@ -218,7 +217,6 @@ class _HelpScreenState extends State<HelpScreen> {
                             child: Column(
                               children: [
                                 chatWidgets[index],
-                                // Tambahkan daftar pertanyaan/kategori di bawah bubble terakhir
                                 if (index == chatWidgets.length - 1 &&
                                     !chatBubble.isUserMessage)
                                   _buildOptionsList(),
@@ -244,7 +242,7 @@ class _HelpScreenState extends State<HelpScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Show categories if no specific questions are shown
+
           if (!showProductQuestions &&
               !showPengirimanQuestions &&
               !showPembayaranQuestions &&
@@ -277,7 +275,7 @@ class _HelpScreenState extends State<HelpScreen> {
               );
             }).toList(),
 
-          // Product questions section
+
           if (showProductQuestions) ...[
             ...produkChat.map((qa) {
               return Padding(
@@ -307,7 +305,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 ),
               );
             }).toList(),
-            _buildBackButton(), // Back button for product questions
+            _buildBackButton(), 
           ],
 
           if (showPengirimanQuestions) ...[
@@ -339,10 +337,9 @@ class _HelpScreenState extends State<HelpScreen> {
                 ),
               );
             }).toList(),
-            _buildBackButton(), // Back button for delivery questions
+            _buildBackButton(), 
           ],
 
-          // Payment questions section (placeholder)
           if (showPembayaranQuestions) ...[
             ...pembayaranChat.map((qa) {
               return Padding(
@@ -372,7 +369,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 ),
               );
             }).toList(),
-            _buildBackButton(), // Tambahkan tombol kembali
+            _buildBackButton(), 
           ],
 
           if (showAkunPenggunaQuestions) ...[
@@ -458,7 +455,7 @@ class _HelpScreenState extends State<HelpScreen> {
             foregroundColor: AppColors.secondary,
             textStyle: const TextStyle(fontSize: 16),
           ),
-          onPressed: _backToCategories, // Use the updated method here
+          onPressed: _backToCategories, 
           child: const Text('Kembali ke Pertanyaan Lainnya'),
         ),
       ),

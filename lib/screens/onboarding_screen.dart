@@ -43,11 +43,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       precacheImage(const AssetImage("assets/onboarding1.png"), context);
 
       if (mounted) {
-        setState(() {}); // Pastikan UI diperbarui setelah preload
+        setState(() {}); 
       }
     });
 
-    // Inisialisasi PageController dan tambahkan listener
     _pageController = PageController();
     _pageController.addListener(() {
       if (_pageController.hasClients && mounted) {
@@ -84,7 +83,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         PageRouteBuilder(
           transitionDuration: const Duration(
             milliseconds: 400,
-          ), // Sama dengan SignUpScreen
+          ),
           pageBuilder:
               (context, animation, secondaryAnimation) => const LoginScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -101,11 +100,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   filter: ImageFilter.blur(
                     sigmaX: 10.0,
                     sigmaY: 10.0,
-                  ), // Pastikan blur sama
+                  ), 
                   child: Container(
                     color: Colors.black.withOpacity(
                       0.1,
-                    ), // Efek transparan agar blur terlihat
+                    ), 
                   ),
                 ),
                 // **Animasi Slide dan Fade**
@@ -151,7 +150,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             data["image"]!,
                             height:
                                 MediaQuery.of(context).size.height *
-                                0.4, // Ukuran gambar adaptif
+                                0.4,
                             fit: BoxFit.contain,
                           ),
                         ),

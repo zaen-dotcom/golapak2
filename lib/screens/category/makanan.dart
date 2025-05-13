@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../components/cardproduct.dart';
 import '../../providers/cart_provider.dart';
-import '../../models/product_model.dart'; // Ganti dengan path ke foodModel
-import '../../services/product_service.dart'; // Pastikan fetchMakanan dipindah ke service
+import '../../models/product_model.dart'; 
+import '../../services/product_service.dart'; 
 
 class MakananScreen extends StatefulWidget {
   const MakananScreen({Key? key}) : super(key: key);

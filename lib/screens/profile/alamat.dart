@@ -39,7 +39,6 @@ class _AlamatScreenState extends State<AlamatScreen> {
 
     final addresses = await getAddress(userId);
 
-    // Pisahkan alamat utama dan lainnya
     List<Map<String, dynamic>> mainAddress = [];
     List<Map<String, dynamic>> otherAddresses = [];
 
@@ -126,7 +125,7 @@ class _AlamatScreenState extends State<AlamatScreen> {
                               ),
                         ),
                       ).then((_) {
-                        _loadAddresses(); // Refresh setelah kembali
+                        _loadAddresses();
                       });
                     },
 

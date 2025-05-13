@@ -46,7 +46,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       return;
     }
 
-    if (isButtonLoading) return; // Cegah klik ganda
+    if (isButtonLoading) return; 
 
     setState(() {
       isButtonLoading = true;

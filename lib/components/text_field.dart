@@ -39,7 +39,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           widget.label.toUpperCase(),
           style: const TextStyle(
             fontWeight: FontWeight.bold,
-            color: Color(0xFF607D8B), // Warna biru keabu-abuan
+            color: Color(0xFF607D8B), 
           ),
         ),
         const SizedBox(height: 8),
@@ -50,7 +50,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           decoration: InputDecoration(
             hintText: widget.hintText,
             filled: true,
-            fillColor: AppColors.lightGreyBlue, // Ganti dengan lightGreyBlue
+            fillColor: AppColors.lightGreyBlue, 
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide.none,
@@ -60,7 +60,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     ? IconButton(
                       icon: Icon(
                         _obscureText ? Icons.visibility_off : Icons.visibility,
-                        color: Color(0xFF607D8B), // Warna ikon biru keabu-abuan
+                        color: Color(0xFF607D8B), 
                       ),
                       onPressed: _togglePasswordVisibility,
                     )

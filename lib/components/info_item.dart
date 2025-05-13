@@ -17,7 +17,7 @@ class InfoItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.lightGreyBlue, // menggunakan warna dari AppColors
+        color: AppColors.lightGreyBlue,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.lightGreyBlue, width: 1.5),
       ),

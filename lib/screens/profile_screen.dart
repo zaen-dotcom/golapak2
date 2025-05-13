@@ -34,7 +34,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final user = await getUser();
 
-      // Set user ke state
       setState(() {
         _user = user;
       });

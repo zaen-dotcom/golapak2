@@ -3,8 +3,8 @@ import '../theme/colors.dart';
 
 class AddressCard extends StatelessWidget {
   final String address;
-  final String name;  // Menambahkan parameter untuk nama
-  final String phone; // Menambahkan parameter untuk nomor telepon
+  final String name;  
+  final String phone;
   final bool isMain;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
@@ -44,7 +44,7 @@ class AddressCard extends StatelessWidget {
           ),
           const SizedBox(width: 12),
 
-          // Label, nama, telepon, dan alamat
+         
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,12 +59,12 @@ class AddressCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  name,  // Menampilkan nama
+                  name, 
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  phone,  // Menampilkan nomor telepon
+                  phone,  
                   style: const TextStyle(color: Colors.black54, fontSize: 13),
                 ),
                 const SizedBox(height: 4),
@@ -76,7 +76,6 @@ class AddressCard extends StatelessWidget {
             ),
           ),
 
-          // Tombol edit dan hapus
           Row(
             children: [
               IconButton(

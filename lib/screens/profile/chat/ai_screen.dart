@@ -68,14 +68,14 @@ class _AIScreenState extends State<AIScreen> with TickerProviderStateMixin {
     });
 
     msg.animationController.forward().then((_) {
-      // Scroll after animation completes
+
       _scrollToBottom();
     });
   }
 
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
-      // Add a small delay to ensure the widget is built
+
       Future.delayed(const Duration(milliseconds: 50), () {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
@@ -138,7 +138,7 @@ class _AIScreenState extends State<AIScreen> with TickerProviderStateMixin {
               Expanded(
                 child: NotificationListener<ScrollNotification>(
                   onNotification: (notification) {
-                    // Keep track of scroll position if needed
+
                     return false;
                   },
                   child: ListView.builder(

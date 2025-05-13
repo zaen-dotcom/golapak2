@@ -32,10 +32,10 @@ class _CategoryScreenState extends State<CategoryScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // DIBUNGKUS Material agar tidak ada shadow/garis
+         
           Material(
-            color: Colors.white, // background sesuai tema kamu
-            elevation: 0, // hilangkan garis bawah
+            color: Colors.white, 
+            elevation: 0, 
             child: Container(
               decoration: BoxDecoration(
                 color: Theme.of(context).scaffoldBackgroundColor,

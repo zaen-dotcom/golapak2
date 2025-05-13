@@ -72,7 +72,7 @@ Future<Map<String, dynamic>?> addAddress({
       };
     }
   } catch (e) {
-    // Bisa log error saat dev, atau kirim ke crashlytics kalau perlu
+
   }
 
   return null;
@@ -114,7 +114,7 @@ Future<List<Map<String, dynamic>>> getAddress(int userId) async {
 }
 
 Future<bool> updateAddress(Map<String, dynamic> data) async {
-  final token = await TokenManager.getToken(); // Ambil token dari penyimpanan
+  final token = await TokenManager.getToken(); 
 
   if (token == null) {
     print('Token tidak ditemukan');

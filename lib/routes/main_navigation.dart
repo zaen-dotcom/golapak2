@@ -16,7 +16,7 @@ class _MainNavigationState extends State<MainNavigation> {
 
   final List<Widget> _pages = const [
     HomeScreen(),
-    OrderNavigation(), // ganti dari PesananScreen ke OrderNavigation
+    OrderNavigation(),
     ProfileScreen(),
   ];
 

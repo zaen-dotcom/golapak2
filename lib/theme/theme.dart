@@ -28,8 +28,8 @@ class AppTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary, // Warna tombol
-        foregroundColor: Colors.white, // Warna teks di tombol
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white, 
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),

@@ -22,7 +22,7 @@ class DotIndicator extends StatelessWidget {
             color:
                 currentIndex == index
                     ? AppColors
-                        .primary // Warna oranye untuk titik aktif
+                        .primary 
                     : AppColors.primary.withOpacity(
                       0.3,
                     ), // Warna oranye transparan

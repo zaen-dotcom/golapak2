@@ -19,7 +19,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool isLoading = false;
-  bool rememberMe = false;
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -53,11 +52,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final response = await login(email, password);
     setState(() => isLoading = false);
+
     if (response['status'] == 'success') {
-      if (rememberMe) {
-        // Simpan token jika checkbox dicentang
-        await TokenManager.saveToken(response['access_token']);
-      }
+      // Simpan token langsung tanpa perlu checkbox
+      await TokenManager.saveToken(response['access_token']);
+
       Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
     } else {
       showDialog(
@@ -136,89 +135,73 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _passwordController,
                   ),
                   const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: rememberMe,
-                            onChanged: (value) {
-                              setState(() {
-                                rememberMe = value ?? false;
-                              });
-                            },
-                          ),
-                          const Text("Ingat saya"),
-                        ],
-                      ),
-
-                      RichText(
-                        text: TextSpan(
-                          text: "Lupa Sandi",
-                          style: Theme.of(context).textTheme.bodyMedium!
-                              .copyWith(color: AppColors.link),
-                          recognizer:
-                              TapGestureRecognizer()
-                                ..onTap = () {
-                                  Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      transitionDuration: const Duration(
-                                        milliseconds: 300,
-                                      ),
-                                      pageBuilder:
-                                          (
-                                            context,
-                                            animation,
-                                            secondaryAnimation,
-                                          ) => ForgotPasswordScreen(),
-                                      transitionsBuilder: (
-                                        context,
-                                        animation,
-                                        secondaryAnimation,
-                                        child,
-                                      ) {
-                                        return Stack(
-                                          children: [
-                                            BackdropFilter(
-                                              filter: ImageFilter.blur(
-                                                sigmaX: 10.0,
-                                                sigmaY: 10.0,
-                                              ),
-                                              child: Container(
-                                                color: Colors.black.withOpacity(
-                                                  0.1,
-                                                ),
-                                              ),
-                                            ),
-                                            SlideTransition(
-                                              position: Tween<Offset>(
-                                                begin: const Offset(1.0, 0.0),
-                                                end: Offset.zero,
-                                              ).animate(animation),
-                                              child: FadeTransition(
-                                                opacity: animation,
-                                                child: child,
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Lupa Sandi",
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium!.copyWith(color: AppColors.link),
+                        recognizer:
+                            TapGestureRecognizer()
+                              ..onTap = () {
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    transitionDuration: const Duration(
+                                      milliseconds: 300,
                                     ),
-                                  );
-                                },
-                        ),
+                                    pageBuilder:
+                                        (
+                                          context,
+                                          animation,
+                                          secondaryAnimation,
+                                        ) => ForgotPasswordScreen(),
+                                    transitionsBuilder: (
+                                      context,
+                                      animation,
+                                      secondaryAnimation,
+                                      child,
+                                    ) {
+                                      return Stack(
+                                        children: [
+                                          BackdropFilter(
+                                            filter: ImageFilter.blur(
+                                              sigmaX: 10.0,
+                                              sigmaY: 10.0,
+                                            ),
+                                            child: Container(
+                                              color: Colors.black.withOpacity(
+                                                0.1,
+                                              ),
+                                            ),
+                                          ),
+                                          SlideTransition(
+                                            position: Tween<Offset>(
+                                              begin: const Offset(1.0, 0.0),
+                                              end: Offset.zero,
+                                            ).animate(animation),
+                                            child: FadeTransition(
+                                              opacity: animation,
+                                              child: child,
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
                       ),
-                    ],
+                    ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 25),
                   CustomButton(
                     text: "LOG IN",
                     onPressed: isLoading ? null : _handleLogin,
                     isLoading: isLoading,
                   ),
-
                   const SizedBox(height: 20),
                   Center(
                     child: RichText(
