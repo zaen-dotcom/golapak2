@@ -9,33 +9,20 @@ class CategoryScreen extends StatefulWidget {
   State<CategoryScreen> createState() => _CategoryScreenState();
 }
 
-class _CategoryScreenState extends State<CategoryScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+class _CategoryScreenState extends State<CategoryScreen> {
+  int _selectedTabIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
+      initialIndex: _selectedTabIndex,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-         
           Material(
-            color: Colors.white, 
-            elevation: 0, 
+            color: Colors.white,
+            elevation: 0,
             child: Container(
               decoration: BoxDecoration(
                 color: Theme.of(context).scaffoldBackgroundColor,
@@ -51,7 +38,6 @@ class _CategoryScreenState extends State<CategoryScreen>
               ),
               margin: const EdgeInsets.symmetric(horizontal: 16),
               child: TabBar(
-                controller: _tabController,
                 dividerColor: Colors.transparent,
                 indicator: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
@@ -67,16 +53,19 @@ class _CategoryScreenState extends State<CategoryScreen>
                 ),
                 unselectedLabelStyle: Theme.of(context).textTheme.bodyLarge,
                 tabs: const [Tab(text: 'Makanan'), Tab(text: 'Minuman')],
+                onTap: (index) {
+                  print('Tab diklik: $index (0: Makanan, 1: Minuman)');
+                  setState(() {
+                    _selectedTabIndex = index;
+                  });
+                },
               ),
             ),
           ),
           const SizedBox(height: 8),
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.8,
-            child: TabBarView(
-              controller: _tabController,
-              children: const [MakananScreen(), MinumanScreen()],
-            ),
+          IndexedStack(
+            index: _selectedTabIndex,
+            children: [MakananScreen(), MinumanScreen()],
           ),
         ],
       ),

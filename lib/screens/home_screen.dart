@@ -8,7 +8,7 @@ import '../providers/cart_provider.dart';
 import '../theme/colors.dart';
 import 'dart:ui';
 import '../screens/profile/help.dart';
-import '../components/dot_indicator.dart'; 
+import '../components/dot_indicator.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -72,12 +72,11 @@ class _HomeScreenState extends State<HomeScreen>
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return Stack(
             children: [
-            
               BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                 child: Container(color: Colors.black.withOpacity(0.1)),
               ),
-              
+
               SlideTransition(
                 position: Tween<Offset>(
                   begin: const Offset(1.0, 0.0),
@@ -143,6 +142,9 @@ class _HomeScreenState extends State<HomeScreen>
                                     child: TextField(
                                       controller: _searchController,
                                       focusNode: _focusNode,
+                                      onTapOutside: (event) {
+                                        _focusNode.unfocus();
+                                      },
                                       decoration: InputDecoration(
                                         hintText: "Cari...",
                                         hintStyle: const TextStyle(
@@ -200,8 +202,6 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                     ),
                   ),
-
-                  // Banner
                   SliverToBoxAdapter(
                     child: SizedBox(
                       height: MediaQuery.of(context).size.height * 0.3,
@@ -226,18 +226,13 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                     ),
                   ),
-
-                  
                   SliverToBoxAdapter(
                     child: DotIndicator(
                       currentIndex: _currentBanner,
                       dotCount: _bannerCount,
                     ),
                   ),
-
                   const SliverToBoxAdapter(child: SizedBox(height: 20)),
-
-                 
                   const SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20),
@@ -251,11 +246,8 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                     ),
                   ),
-
                   const SliverToBoxAdapter(child: SizedBox(height: 15)),
-
                   const SliverToBoxAdapter(child: CategoryScreen()),
-
                   const SliverToBoxAdapter(child: SizedBox(height: 100)),
                 ],
               ),
