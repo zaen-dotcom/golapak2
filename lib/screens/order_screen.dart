@@ -7,10 +7,7 @@ class OrderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text(
-          'Ini Order',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
+        child: Text('Ini Order', style: Theme.of(context).textTheme.titleLarge),
       ),
     );
   }

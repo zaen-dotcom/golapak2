@@ -81,60 +81,69 @@ class _AlamatScreenState extends State<AlamatScreen> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body:
-          _isLoading
-              ? ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: 3,
-                itemBuilder: (context, index) {
-                  return _buildSkeleton();
-                },
-              )
-              : _addressList.isEmpty
-              ? const Center(
-                child: Text(
-                  'Tidak ada alamat.',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black54,
-                  ),
-                ),
-              )
-              : ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: _addressList.length,
-                itemBuilder: (context, index) {
-                  final item = _addressList[index];
-                  return AddressCard(
-                    address: item['address'] ?? 'Alamat tidak tersedia',
-                    name: item['name'] ?? 'Nama tidak tersedia',
-                    phone: item['phone_number'] ?? 'Nomor tidak tersedia',
-                    isMain: item['main_address'] == 1,
-                    onEdit: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) => UpdateAddressScreen(
-                                addressId: item['id'],
-                                initialName: item['name'] ?? '',
-                                initialPhone: item['phone_number'] ?? '',
-                                initialAddress: item['address'] ?? '',
-                                initialIsMain: item['main_address'] == 1,
-                              ),
+      body: RefreshIndicator(
+        onRefresh: _loadAddresses,
+        color: Theme.of(context).primaryColor,
+        backgroundColor: Colors.white,
+        displacement: 40.0,
+        child:
+            _isLoading
+                ? ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: 3,
+                  itemBuilder: (context, index) {
+                    return _buildSkeleton();
+                  },
+                )
+                : _addressList.isEmpty
+                ? ListView(
+                  children: const [
+                    Center(
+                      child: Text(
+                        'Tidak ada alamat.',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black54,
                         ),
-                      ).then((_) {
-                        _loadAddresses();
-                      });
-                    },
-
-                    onDelete: () {
-                      // TODO: Aksi hapus alamat
-                    },
-                  );
-                },
-              ),
+                      ),
+                    ),
+                  ],
+                )
+                : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _addressList.length,
+                  itemBuilder: (context, index) {
+                    final item = _addressList[index];
+                    return AddressCard(
+                      address: item['address'] ?? 'Alamat tidak tersedia',
+                      name: item['name'] ?? 'Nama tidak tersedia',
+                      phone: item['phone_number'] ?? 'Nomor tidak tersedia',
+                      isMain: item['main_address'] == 1,
+                      onEdit: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => UpdateAddressScreen(
+                                  addressId: item['id'],
+                                  initialName: item['name'] ?? '',
+                                  initialPhone: item['phone_number'] ?? '',
+                                  initialAddress: item['address'] ?? '',
+                                  initialIsMain: item['main_address'] == 1,
+                                ),
+                          ),
+                        ).then((_) {
+                          _loadAddresses();
+                        });
+                      },
+                      onDelete: () {
+                        // TODO: Aksi hapus alamat
+                      },
+                    );
+                  },
+                ),
+      ),
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         child: CustomButton(
