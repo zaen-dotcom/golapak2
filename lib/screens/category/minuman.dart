@@ -33,7 +33,20 @@ class _MinumanScreenState extends State<MinumanScreen> {
           return Center(child: Text('Terjadi kesalahan: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           print('Tidak ada data di MinumanScreen');
-          return const Center(child: Text('Tidak ada data minuman'));
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 30),
+                Icon(Icons.local_drink, size: 80, color: Colors.grey[400]),
+                const SizedBox(height: 16),
+                Text(
+                  'Tidak ada minuman tersedia',
+                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+          );
         } else {
           final minumanList = snapshot.data!;
           print('Jumlah item di MinumanScreen: ${minumanList.length}');

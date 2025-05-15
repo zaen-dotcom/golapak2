@@ -63,18 +63,6 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
-  // Function to handle refresh logic
-  Future<void> _onRefresh() async {
-    // Simulate a network fetch or data refresh with a delay
-    await Future.delayed(const Duration(seconds: 2));
-    // Optionally, update state or fetch new data here
-    setState(() {
-      // Example: Reset banner or fetch new data
-      _currentBanner = 0;
-      _pageController.jumpToPage(0);
-    });
-  }
-
   void _navigateToHelpScreen(BuildContext context) {
     Navigator.push(
       context,
@@ -113,160 +101,154 @@ class _HomeScreenState extends State<HomeScreen>
           SafeArea(
             child: GestureDetector(
               onTap: () => _focusNode.unfocus(),
-              child: RefreshIndicator(
-                onRefresh: _onRefresh, // Called when user pulls down
-                color: AppColors.primary, // Spinner color
-                backgroundColor: Colors.white, // Background of the spinner
-                displacement: 40.0, // Distance before refresh triggers
-                child: CustomScrollView(
-                  slivers: [
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: AppColors.lightGreyBlue,
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      spreadRadius: 2,
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.search,
-                                      color: Colors.black,
-                                      size: 22,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: TextField(
-                                        controller: _searchController,
-                                        focusNode: _focusNode,
-                                        onTapOutside: (event) {
-                                          _focusNode.unfocus();
-                                        },
-                                        decoration: InputDecoration(
-                                          hintText: "Cari...",
-                                          hintStyle: const TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 14,
-                                          ),
-                                          border: InputBorder.none,
-                                          filled: true,
-                                          fillColor: Colors.transparent,
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                vertical: 12,
-                                                horizontal: 8,
-                                              ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide.none,
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                              color: Color(0xFFB0BEC5),
-                                              width: 1.2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Container(
-                              width: 50,
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
                               height: 50,
                               decoration: BoxDecoration(
                                 color: AppColors.lightGreyBlue,
                                 borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    spreadRadius: 2,
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                               ),
-                              child: IconButton(
-                                icon: const Icon(
-                                  Icons.support_agent_rounded,
-                                  color: Colors.black,
-                                  size: 26,
-                                ),
-                                onPressed: () => _navigateToHelpScreen(context),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.search,
+                                    color: Colors.black,
+                                    size: 22,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: TextField(
+                                      controller: _searchController,
+                                      focusNode: _focusNode,
+                                      onTapOutside: (event) {
+                                        _focusNode.unfocus();
+                                      },
+                                      decoration: InputDecoration(
+                                        hintText: "Cari...",
+                                        hintStyle: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                        ),
+                                        border: InputBorder.none,
+                                        filled: true,
+                                        fillColor: Colors.transparent,
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                              vertical: 12,
+                                              horizontal: 8,
+                                            ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide.none,
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                            color: Color(0xFFB0BEC5),
+                                            width: 1.2,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.3,
-                        child: PageView.builder(
-                          controller: _pageController,
-                          itemCount: _bannerCount,
-                          onPageChanged: (index) {
-                            setState(() {
-                              _currentBanner = index;
-                            });
-                          },
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0,
-                              ),
-                              child: BannerPlaceholder(
-                                imageUrl: _bannerUrls[index],
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: DotIndicator(
-                        currentIndex: _currentBanner,
-                        dotCount: _bannerCount,
-                      ),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
-                    const SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: Text(
-                          'Kategori Menu',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
                           ),
+                          const SizedBox(width: 10),
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: AppColors.lightGreyBlue,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.support_agent_rounded,
+                                color: Colors.black,
+                                size: 26,
+                              ),
+                              onPressed: () => _navigateToHelpScreen(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      child: PageView.builder(
+                        controller: _pageController,
+                        itemCount: _bannerCount,
+                        onPageChanged: (index) {
+                          setState(() {
+                            _currentBanner = index;
+                          });
+                        },
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: BannerPlaceholder(
+                              imageUrl: _bannerUrls[index],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: DotIndicator(
+                      currentIndex: _currentBanner,
+                      dotCount: _bannerCount,
+                    ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        'Kategori Menu',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
                         ),
                       ),
                     ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 15)),
-                    const SliverToBoxAdapter(child: CategoryScreen()),
-                    const SliverToBoxAdapter(child: SizedBox(height: 100)),
-                  ],
-                ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 15)),
+                  const SliverToBoxAdapter(child: CategoryScreen()),
+                  const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                ],
               ),
             ),
           ),
@@ -275,7 +257,10 @@ class _HomeScreenState extends State<HomeScreen>
             right: 20,
             bottom: MediaQuery.of(context).padding.bottom + 12,
             child: AnimatedSlide(
-              offset: cartProvider.totalItems > 0 ? Offset.zero : Offset(0, 1),
+              offset:
+                  cartProvider.totalItems > 0
+                      ? Offset.zero
+                      : const Offset(0, 1),
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
               child: AnimatedOpacity(
