@@ -38,11 +38,11 @@ class _MinumanScreenState extends State<MinumanScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 30),
-                Icon(Icons.local_drink, size: 80, color: Colors.grey[400]),
+                Icon(Icons.local_drink, size: 50, color: Colors.grey[400]),
                 const SizedBox(height: 16),
                 Text(
                   'Tidak ada minuman tersedia',
-                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 15, color: Colors.grey[600]),
                 ),
               ],
             ),

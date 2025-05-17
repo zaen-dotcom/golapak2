@@ -34,6 +34,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final user = await getUser();
 
+      if (!mounted) return;
+
       setState(() {
         _user = user;
       });
@@ -42,6 +44,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Provider.of<UserProvider>(context, listen: false).setUserId(user.id);
       }
     } catch (e) {
+      if (!mounted) return;
+
       setState(() {
         _user = null;
       });

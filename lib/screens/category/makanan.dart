@@ -38,11 +38,11 @@ class _MakananScreenState extends State<MakananScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 30),
-                Icon(Icons.restaurant_menu, size: 80, color: Colors.grey[400]),
+                Icon(Icons.restaurant_menu, size: 50, color: Colors.grey[400]),
                 const SizedBox(height: 16),
                 Text(
                   'Tidak ada makanan tersedia',
-                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 15, color: Colors.grey[600]),
                 ),
               ],
             ),
