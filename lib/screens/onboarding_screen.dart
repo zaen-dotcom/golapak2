@@ -5,7 +5,6 @@ import '../components/button.dart';
 import '../components/dot_indicator.dart';
 import '../theme/colors.dart';
 import '../screens/login_screen.dart';
-import '../utils/token_manager.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
@@ -36,14 +35,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
-    _checkToken();
 
-    // Preload gambar onboarding1 agar langsung muncul
     WidgetsBinding.instance.addPostFrameCallback((_) {
       precacheImage(const AssetImage("assets/onboarding1.png"), context);
 
       if (mounted) {
-        setState(() {}); 
+        setState(() {});
       }
     });
 
@@ -63,13 +60,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
-  void _checkToken() async {
-    final token = await TokenManager.getToken();
-    if (token != null && token.isNotEmpty) {
-      Navigator.pushReplacementNamed(context, '/main');
-    }
-  }
-
   void _nextPage() {
     if (_currentPage < _onboardingData.length - 1) {
       _pageController.animateToPage(
@@ -81,9 +71,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       Navigator.push(
         context,
         PageRouteBuilder(
-          transitionDuration: const Duration(
-            milliseconds: 400,
-          ),
+          transitionDuration: const Duration(milliseconds: 400),
           pageBuilder:
               (context, animation, secondaryAnimation) => const LoginScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -97,15 +85,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               children: [
                 // **Lapisan Blur**
                 BackdropFilter(
-                  filter: ImageFilter.blur(
-                    sigmaX: 10.0,
-                    sigmaY: 10.0,
-                  ), 
-                  child: Container(
-                    color: Colors.black.withOpacity(
-                      0.1,
-                    ), 
-                  ),
+                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                  child: Container(color: Colors.black.withOpacity(0.1)),
                 ),
                 // **Animasi Slide dan Fade**
                 SlideTransition(
@@ -148,9 +129,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Flexible(
                           child: Image.asset(
                             data["image"]!,
-                            height:
-                                MediaQuery.of(context).size.height *
-                                0.4,
+                            height: MediaQuery.of(context).size.height * 0.4,
                             fit: BoxFit.contain,
                           ),
                         ),

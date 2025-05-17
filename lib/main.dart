@@ -7,8 +7,9 @@ import 'screens/forgot_screen.dart';
 import 'routes/main_navigation.dart';
 import 'screens/verifyotp_screen.dart';
 import 'providers/cart_provider.dart';
-import 'providers/user_provider.dart'; 
+import 'providers/user_provider.dart';
 import 'screens/profile/keranjang.dart';
+import 'screens/splash_screen.dart';
 import 'theme/theme.dart';
 
 void main() {
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<CartProvider>(create: (_) => CartProvider()),
-        ChangeNotifierProvider<UserProvider>(create: (_) => UserProvider()), 
+        ChangeNotifierProvider<UserProvider>(create: (_) => UserProvider()),
       ],
       child: MaterialApp(
         title: 'My App',
@@ -31,7 +32,8 @@ class MyApp extends StatelessWidget {
         theme: AppTheme.lightTheme,
         initialRoute: '/',
         routes: {
-          '/': (context) => const OnboardingScreen(),
+          '/': (context) => const SplashScreen(),
+          '/onboarding': (context) => const OnboardingScreen(),
           '/login': (context) => const LoginScreen(),
           '/signup': (context) => const SignUpScreen(),
           '/forgot': (context) => ForgotPasswordScreen(),
