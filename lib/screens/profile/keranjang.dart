@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; 
-import '../../providers/cart_provider.dart'; 
+import '../../components/button.dart'; // Import CustomButton
+import '../../components/cardproduct.dart'; // Import CardProduct widget
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final cartProvider = Provider.of<CartProvider>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -29,18 +28,75 @@ class CartScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: ListView.builder(
-        itemCount: cartProvider.items.length,
-        itemBuilder: (context, index) {
-          final item = cartProvider.items.keys.elementAt(index);
-          return ListTile(
-            title: Text(item),
-            trailing: Text('Qty: ${cartProvider.items[item]}'),
-            onTap: () {
-             
-            },
-          );
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // Daftar produk di keranjang
+            Expanded(
+              child: ListView.builder(
+                itemCount: 5, // Misalnya ada 5 produk di keranjang
+                itemBuilder: (context, index) {
+                  return CardProduct(
+                    title: 'Pizza Calzone',
+                    price: 'Rp. 64,000',
+                    imageUrl: 'https://via.placeholder.com/150',
+                    quantity: 2,
+                    onIncrement: () {
+                      // Implement aksi untuk menambah kuantitas
+                    },
+                    onDecrement: () {
+                      // Implement aksi untuk mengurangi kuantitas
+                    },
+                  );
+                },
+              ),
+            ),
+            // Bagian Alamat Pengiriman
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '2118 Thornridge Cir. Syracuse',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      // Aksi edit alamat
+                    },
+                    child: Text('EDIT'),
+                  ),
+                ],
+              ),
+            ),
+            // Bagian Total Harga
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'TOTAL:',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'Rp. 128,000',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+            // Ganti ElevatedButton dengan CustomButton
+            CustomButton(
+              text: 'PLACE ORDER',
+              onPressed: () {
+                // Aksi untuk melakukan pemesanan
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
