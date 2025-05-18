@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:golapak2/screens/home_screen.dart';
+import 'package:shimmer/main.dart';
 import '../components/button.dart';
 import '../components/dot_indicator.dart';
 import '../theme/colors.dart';
@@ -85,7 +87,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             milliseconds: 400,
           ),
           pageBuilder:
-              (context, animation, secondaryAnimation) => const LoginScreen(),
+              (context, animation, secondaryAnimation) => const HomeScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             // Animasi lebih smooth
             final curvedAnimation = CurvedAnimation(
@@ -186,7 +188,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: CustomButton(text: "NEXT", onPressed: _nextPage),
+              child: CustomButton(text: "NEXT", onPressed: () {
+                Navigator.pushReplacementNamed(context, '/main');
+              }),
             ),
           ],
         ),
