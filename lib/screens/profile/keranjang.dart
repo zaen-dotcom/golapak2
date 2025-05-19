@@ -18,16 +18,15 @@ Future<void> showCustomAlertDialog({
   return showDialog(
     context: context,
     barrierDismissible: false,
-    builder:
-        (ctx) => CustomAlert(
-          title: title,
-          message: message,
-          confirmText: confirmText,
-          onConfirm: () {
-            Navigator.of(ctx).pop();
-            onConfirm();
-          },
-        ),
+    builder: (ctx) => CustomAlert(
+      title: title,
+      message: message,
+      confirmText: confirmText,
+      onConfirm: () {
+        Navigator.of(ctx).pop();
+        onConfirm();
+      },
+    ),
   );
 }
 
@@ -72,32 +71,31 @@ class _CartScreenState extends State<CartScreen> {
         child: Column(
           children: [
             Expanded(
-              child:
-                  cartItems.isEmpty
-                      ? const Center(child: Text('Keranjang masih kosong'))
-                      : ListView.builder(
-                        itemCount: cartItems.length,
-                        itemBuilder: (context, index) {
-                          final item = cartItems[index];
-                          return CardProduct(
-                            title: item.title,
-                            price: 'Rp. ${item.price.toInt()}',
-                            imageUrl: item.imageUrl,
-                            quantity: cart.getQuantity(item.id, item.title),
-                            onIncrement: () {
-                              cart.addItem(
-                                id: item.id,
-                                title: item.title,
-                                imageUrl: item.imageUrl,
-                                price: item.price,
-                              );
-                            },
-                            onDecrement: () {
-                              cart.removeItem(item.id, item.title);
-                            },
-                          );
-                        },
-                      ),
+              child: cartItems.isEmpty
+                  ? const Center(child: Text('Keranjang masih kosong'))
+                  : ListView.builder(
+                      itemCount: cartItems.length,
+                      itemBuilder: (context, index) {
+                        final item = cartItems[index];
+                        return CardProduct(
+                          title: item.title,
+                          price: 'Rp. ${item.price.toInt()}',
+                          imageUrl: item.imageUrl,
+                          quantity: cart.getQuantity(item.id, item.title),
+                          onIncrement: () {
+                            cart.addItem(
+                              id: item.id,
+                              title: item.title,
+                              imageUrl: item.imageUrl,
+                              price: item.price,
+                            );
+                          },
+                          onDecrement: () {
+                            cart.removeItem(item.id, item.title);
+                          },
+                        );
+                      },
+                    ),
             ),
 
             const SizedBox(height: 12),
@@ -111,8 +109,7 @@ class _CartScreenState extends State<CartScreen> {
                 color: Colors.grey.shade100,
               ),
               child: Row(
-                crossAxisAlignment:
-                    CrossAxisAlignment.center, // ICON vertical center
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
                     height: 60,
@@ -127,33 +124,32 @@ class _CartScreenState extends State<CartScreen> {
                   const SizedBox(width: 8),
 
                   Expanded(
-                    child:
-                        selectedAlamat != null
-                            ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  selectedAlamat['name'] ?? '-',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                  ),
+                    child: selectedAlamat != null
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                selectedAlamat['name'] ?? '-',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  selectedAlamat['address'] ?? '-',
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                              ],
-                            )
-                            : const Text(
-                              'Pilih Alamat',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black54,
                               ),
+                              const SizedBox(height: 4),
+                              Text(
+                                selectedAlamat['address'] ?? '-',
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          )
+                        : const Text(
+                            'Pilih Alamat',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
                             ),
+                          ),
                   ),
 
                   TextButton(
@@ -178,6 +174,18 @@ class _CartScreenState extends State<CartScreen> {
               child: CustomButton(
                 text: 'BUAT PESANAN',
                 onPressed: () async {
+                  if (cartItems.isEmpty) {
+                    await showCustomAlertDialog(
+                      context: context,
+                      title: 'Keranjang Kosong',
+                      message:
+                          'Silakan tambahkan produk terlebih dahulu sebelum membuat pesanan.',
+                      confirmText: 'OK',
+                      onConfirm: () {},
+                    );
+                    return;
+                  }
+
                   if (selectedAlamat == null) {
                     await showCustomAlertDialog(
                       context: context,
