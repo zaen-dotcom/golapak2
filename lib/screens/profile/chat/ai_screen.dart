@@ -37,7 +37,8 @@ class _AIScreenState extends State<AIScreen> with TickerProviderStateMixin {
     );
 
     _addMessage(
-      message: "Halo! Saya AI Assistant Golapak. Ada yang bisa saya bantu?",
+      message:
+          "Halo! Saya AI Assistant Golapak. Ada yang bisa saya bantu?\n\n⚠️ Catatan: Chat ini tidak disimpan dan akan hilang ketika Anda keluar dari halaman ini.",
       isUser: false,
     );
   }
@@ -68,14 +69,12 @@ class _AIScreenState extends State<AIScreen> with TickerProviderStateMixin {
     });
 
     msg.animationController.forward().then((_) {
-
       _scrollToBottom();
     });
   }
 
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
-
       Future.delayed(const Duration(milliseconds: 50), () {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
@@ -138,7 +137,6 @@ class _AIScreenState extends State<AIScreen> with TickerProviderStateMixin {
               Expanded(
                 child: NotificationListener<ScrollNotification>(
                   onNotification: (notification) {
-
                     return false;
                   },
                   child: ListView.builder(
