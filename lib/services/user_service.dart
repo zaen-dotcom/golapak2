@@ -71,9 +71,7 @@ Future<Map<String, dynamic>?> addAddress({
         'message': jsonResponse['message'],
       };
     }
-  } catch (e) {
-
-  }
+  } catch (e) {}
 
   return null;
 }
@@ -114,7 +112,7 @@ Future<List<Map<String, dynamic>>> getAddress(int userId) async {
 }
 
 Future<bool> updateAddress(Map<String, dynamic> data) async {
-  final token = await TokenManager.getToken(); 
+  final token = await TokenManager.getToken();
 
   if (token == null) {
     print('Token tidak ditemukan');
@@ -150,5 +148,40 @@ Future<bool> updateAddress(Map<String, dynamic> data) async {
   } catch (e) {
     print('Error saat update alamat: $e');
     return false;
+  }
+}
+
+Future<void> deleteAddress(int addressId) async {
+  final token = await TokenManager.getToken();
+
+  if (token == null) {
+    throw Exception('Token tidak ditemukan, silakan login terlebih dahulu.');
+  }
+
+  final url = Uri.parse('${ApiConfig.baseUrl}/delete-address/$addressId');
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['status'] != 'success') {
+        throw Exception(data['message'] ?? 'Gagal menghapus alamat.');
+      }
+      // Tidak print apa pun jika sukses
+    } else {
+      throw Exception(
+        'Gagal menghapus alamat. Status code: ${response.statusCode}',
+      );
+    }
+  } catch (e) {
+    throw Exception('Terjadi kesalahan saat menghapus alamat: $e');
   }
 }

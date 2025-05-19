@@ -68,26 +68,31 @@ class _MinumanScreenState extends State<MinumanScreen> {
                   ),
                   itemBuilder: (context, index) {
                     final minuman = minumanList[index];
-                    final quantity = Provider.of<CartProvider>(
-                      context,
-                    ).getQuantity(minuman.name);
+                    final productId = minuman.id.toString();
 
-                    return CardProduct(
-                      title: minuman.name,
-                      price: 'Rp. ${minuman.mainCost.toInt()}',
-                      imageUrl: minuman.image,
-                      quantity: quantity,
-                      onIncrement: () {
-                        Provider.of<CartProvider>(
-                          context,
-                          listen: false,
-                        ).addItem(minuman.name);
-                      },
-                      onDecrement: () {
-                        Provider.of<CartProvider>(
-                          context,
-                          listen: false,
-                        ).removeItem(minuman.name);
+                    return Consumer<CartProvider>(
+                      builder: (context, cart, child) {
+                        final quantity = cart.getQuantity(
+                          productId,
+                          minuman.name,
+                        );
+                        return CardProduct(
+                          title: minuman.name,
+                          price: 'Rp. ${minuman.mainCost.toInt()}',
+                          imageUrl: minuman.image,
+                          quantity: quantity,
+                          onIncrement: () {
+                            cart.addItem(
+                              id: productId,
+                              title: minuman.name,
+                              imageUrl: minuman.image,
+                              price: minuman.mainCost.toDouble(),
+                            );
+                          },
+                          onDecrement: () {
+                            cart.removeItem(productId, minuman.name);
+                          },
+                        );
                       },
                     );
                   },

@@ -7,6 +7,7 @@ import '../../providers/user_provider.dart';
 import '../../services/user_service.dart';
 import 'add_alamat.dart';
 import 'update_alamat.dart';
+import '../../components/alertdialog.dart';
 
 class AlamatScreen extends StatefulWidget {
   const AlamatScreen({Key? key}) : super(key: key);
@@ -97,14 +98,21 @@ class _AlamatScreenState extends State<AlamatScreen> {
                 )
                 : _addressList.isEmpty
                 ? ListView(
-                  children: const [
-                    Center(
-                      child: Text(
-                        'Tidak ada alamat.',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black54,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.7,
+                      child: const Center(
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 60.0),
+                          child: Text(
+                            'Tidak ada alamat.',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black54,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -137,8 +145,69 @@ class _AlamatScreenState extends State<AlamatScreen> {
                           _loadAddresses();
                         });
                       },
-                      onDelete: () {
-                        // TODO: Aksi hapus alamat
+                      onDelete: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          barrierDismissible:
+                              false, // tidak bisa tap luar dialog untuk tutup
+                          builder:
+                              (context) => WillPopScope(
+                                onWillPop:
+                                    () async =>
+                                        false, // memblok tombol back Android
+                                child: CustomAlert(
+                                  title: 'Hapus Alamat',
+                                  message:
+                                      'Apakah kamu yakin ingin menghapus alamat ini?',
+                                  cancelText: 'Batal',
+                                  onCancel:
+                                      () => Navigator.of(context).pop(false),
+                                  confirmText: 'Hapus',
+                                  onConfirm:
+                                      () => Navigator.of(context).pop(true),
+                                  isDestructive:
+                                      true, // opsional, untuk tombol warna khusus misalnya merah
+                                ),
+                              ),
+                        );
+
+                        if (confirm == true) {
+                          try {
+                            await deleteAddress(item['id']);
+                            _loadAddresses(); // refresh daftar alamat
+                            await showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder:
+                                  (context) => WillPopScope(
+                                    onWillPop: () async => false,
+                                    child: CustomAlert(
+                                      title: 'Berhasil',
+                                      message: 'Alamat berhasil dihapus',
+                                      confirmText: 'OK',
+                                      onConfirm:
+                                          () => Navigator.of(context).pop(),
+                                    ),
+                                  ),
+                            );
+                          } catch (e) {
+                            await showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder:
+                                  (context) => WillPopScope(
+                                    onWillPop: () async => false,
+                                    child: CustomAlert(
+                                      title: 'Gagal Menghapus',
+                                      message: 'Gagal menghapus alamat: $e',
+                                      confirmText: 'OK',
+                                      onConfirm:
+                                          () => Navigator.of(context).pop(),
+                                    ),
+                                  ),
+                            );
+                          }
+                        }
                       },
                     );
                   },

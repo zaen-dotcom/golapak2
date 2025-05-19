@@ -1,12 +1,28 @@
 import 'package:flutter/material.dart';
-import '../../components/button.dart'; // Import CustomButton
-import '../../components/cardproduct.dart'; // Import CardProduct widget
+import 'package:provider/provider.dart';
+import '../../components/button.dart';
+import '../../components/card_cartproduct.dart';
+import '../../providers/cart_provider.dart';
+import '../select_address.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
 
   @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final cart = Provider.of<CartProvider>(context);
+    final cartItems = cart.items.values.toList();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -32,68 +48,62 @@ class CartScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Daftar produk di keranjang
             Expanded(
-              child: ListView.builder(
-                itemCount: 5, // Misalnya ada 5 produk di keranjang
-                itemBuilder: (context, index) {
-                  return CardProduct(
-                    title: 'Pizza Calzone',
-                    price: 'Rp. 64,000',
-                    imageUrl: 'https://via.placeholder.com/150',
-                    quantity: 2,
-                    onIncrement: () {
-                      // Implement aksi untuk menambah kuantitas
-                    },
-                    onDecrement: () {
-                      // Implement aksi untuk mengurangi kuantitas
-                    },
-                  );
-                },
-              ),
+              child:
+                  cartItems.isEmpty
+                      ? const Center(child: Text('Keranjang masih kosong'))
+                      : ListView.builder(
+                        itemCount: cartItems.length,
+                        itemBuilder: (context, index) {
+                          final item = cartItems[index];
+                          return CardProduct(
+                            title: item.title,
+                            price: 'Rp. ${item.price.toInt()}',
+                            imageUrl: item.imageUrl,
+                            quantity: cart.getQuantity(item.id, item.title),
+                            onIncrement: () {
+                              cart.addItem(
+                                id: item.id,
+                                title: item.title,
+                                imageUrl: item.imageUrl,
+                                price: item.price,
+                              );
+                            },
+                            onDecrement: () {
+                              cart.removeItem(item.id, item.title);
+                            },
+                          );
+                        },
+                      ),
             ),
-            // Bagian Alamat Pengiriman
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '2118 Thornridge Cir. Syracuse',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      // Aksi edit alamat
-                    },
-                    child: Text('EDIT'),
-                  ),
-                ],
-              ),
+
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  '2118 Thornridge Cir. Syracuse',
+                  style: TextStyle(fontSize: 16),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SelectAddressScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text('PILIH'),
+                ),
+              ],
             ),
-            // Bagian Total Harga
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'TOTAL:',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    'Rp. 128,000',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
-            // Ganti ElevatedButton dengan CustomButton
-            CustomButton(
-              text: 'PLACE ORDER',
-              onPressed: () {
-                // Aksi untuk melakukan pemesanan
-              },
+            const SizedBox(height: 12),
+
+            /// SafeArea + jarak kecil
+            SafeArea(
+              top: false,
+              child: CustomButton(text: 'BUAT PESANAN', onPressed: () {}),
             ),
           ],
         ),

@@ -68,26 +68,28 @@ class _MakananScreenState extends State<MakananScreen> {
                   ),
                   itemBuilder: (context, index) {
                     final makanan = makananList[index];
-                    final quantity = Provider.of<CartProvider>(
-                      context,
-                    ).getQuantity(makanan.name);
+                    final productId = makanan.id.toString();
 
-                    return CardProduct(
-                      title: makanan.name,
-                      price: 'Rp. ${makanan.mainCost.toInt()}',
-                      imageUrl: makanan.image,
-                      quantity: quantity,
-                      onIncrement: () {
-                        Provider.of<CartProvider>(
-                          context,
-                          listen: false,
-                        ).addItem(makanan.name);
-                      },
-                      onDecrement: () {
-                        Provider.of<CartProvider>(
-                          context,
-                          listen: false,
-                        ).removeItem(makanan.name);
+                    return Consumer<CartProvider>(
+                      builder: (context, cart, child) {
+                        final quantity = cart.getQuantity(productId, makanan.name);
+                        return CardProduct(
+                          title: makanan.name,
+                          price: 'Rp. ${makanan.mainCost.toInt()}',
+                          imageUrl: makanan.image,
+                          quantity: quantity,
+                          onIncrement: () {
+                            cart.addItem(
+                              id: productId,
+                              title: makanan.name,
+                              imageUrl: makanan.image,
+                              price: makanan.mainCost.toDouble(),
+                            );
+                          },
+                          onDecrement: () {
+                            cart.removeItem(productId, makanan.name);
+                          },
+                        );
                       },
                     );
                   },
