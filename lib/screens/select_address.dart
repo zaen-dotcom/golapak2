@@ -1,7 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/address_provider.dart';
+import '../components/address_list.dart';
 
-class SelectAddressScreen extends StatelessWidget {
+class SelectAddressScreen extends StatefulWidget {
   const SelectAddressScreen({super.key});
+
+  @override
+  State<SelectAddressScreen> createState() => _SelectAddressScreenState();
+}
+
+class _SelectAddressScreenState extends State<SelectAddressScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      Provider.of<AlamatProvider>(context, listen: false).fetchAlamat(1);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +42,13 @@ class SelectAddressScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: const Center(child: Text('ini pilih alamat')),
+      body: AlamatList(
+        onSelect: (selectedAlamat) {
+          Provider.of<AlamatProvider>(context, listen: false)
+              .setSelectedAlamat(selectedAlamat);
+          Navigator.pop(context);
+        },
+      ),
     );
   }
 }

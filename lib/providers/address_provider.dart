@@ -3,9 +3,11 @@ import '../services/user_service.dart';
 
 class AlamatProvider with ChangeNotifier {
   List<Map<String, dynamic>> _alamatList = [];
+  Map<String, dynamic>? _selectedAlamat; // ✅ Tambahan
   bool _isLoading = false;
 
   List<Map<String, dynamic>> get alamatList => _alamatList;
+  Map<String, dynamic>? get selectedAlamat => _selectedAlamat; // ✅ Tambahan
   bool get isLoading => _isLoading;
 
   Future<void> fetchAlamat(int userId) async {
@@ -27,8 +29,12 @@ class AlamatProvider with ChangeNotifier {
       }
 
       mainAddress.addAll(otherAddresses);
-
       _alamatList = mainAddress;
+
+      // ✅ Auto set alamat utama sebagai default selected
+      if (mainAddress.isNotEmpty) {
+        _selectedAlamat = mainAddress.first;
+      }
     } catch (e) {
       print("Gagal memuat alamat: $e");
       _alamatList = [];
@@ -38,8 +44,14 @@ class AlamatProvider with ChangeNotifier {
     }
   }
 
+  void setSelectedAlamat(Map<String, dynamic> alamat) {
+    _selectedAlamat = alamat;
+    notifyListeners();
+  }
+
   void clearAlamat() {
     _alamatList = [];
+    _selectedAlamat = null;
     notifyListeners();
   }
 }

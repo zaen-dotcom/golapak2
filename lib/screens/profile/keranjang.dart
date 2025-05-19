@@ -3,7 +3,33 @@ import 'package:provider/provider.dart';
 import '../../components/button.dart';
 import '../../components/card_cartproduct.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/address_provider.dart';
+import '../create_order.dart';
 import '../select_address.dart';
+import '../../components/alertdialog.dart';
+
+Future<void> showCustomAlertDialog({
+  required BuildContext context,
+  required String title,
+  required String message,
+  required String confirmText,
+  required VoidCallback onConfirm,
+}) {
+  return showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder:
+        (ctx) => CustomAlert(
+          title: title,
+          message: message,
+          confirmText: confirmText,
+          onConfirm: () {
+            Navigator.of(ctx).pop();
+            onConfirm();
+          },
+        ),
+  );
+}
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -14,13 +40,10 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
+    final alamatProvider = Provider.of<AlamatProvider>(context);
+    final selectedAlamat = alamatProvider.selectedAlamat;
     final cartItems = cart.items.values.toList();
 
     return Scaffold(
@@ -78,32 +101,103 @@ class _CartScreenState extends State<CartScreen> {
             ),
 
             const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  '2118 Thornridge Cir. Syracuse',
-                  style: TextStyle(fontSize: 16),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SelectAddressScreen(),
-                      ),
-                    );
-                  },
-                  child: const Text('PILIH'),
-                ),
-              ],
+
+            /// Alamat pengiriman
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.grey.shade100,
+              ),
+              child: Row(
+                crossAxisAlignment:
+                    CrossAxisAlignment.center, // ICON vertical center
+                children: [
+                  Container(
+                    height: 60,
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.location_on_outlined,
+                      size: 28,
+                      color: Colors.blue,
+                    ),
+                  ),
+
+                  const SizedBox(width: 8),
+
+                  Expanded(
+                    child:
+                        selectedAlamat != null
+                            ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  selectedAlamat['name'] ?? '-',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  selectedAlamat['address'] ?? '-',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ],
+                            )
+                            : const Text(
+                              'Pilih Alamat',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
+                            ),
+                  ),
+
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SelectAddressScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text('PILIH'),
+                  ),
+                ],
+              ),
             ),
+
             const SizedBox(height: 12),
 
-            /// SafeArea + jarak kecil
             SafeArea(
               top: false,
-              child: CustomButton(text: 'BUAT PESANAN', onPressed: () {}),
+              child: CustomButton(
+                text: 'BUAT PESANAN',
+                onPressed: () async {
+                  if (selectedAlamat == null) {
+                    await showCustomAlertDialog(
+                      context: context,
+                      title: 'Pilih Alamat',
+                      message:
+                          'Pilih alamat terlebih dahulu sebelum melanjutkan.',
+                      confirmText: 'OK',
+                      onConfirm: () {},
+                    );
+                    return;
+                  }
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CreateOrderScreen(),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),
