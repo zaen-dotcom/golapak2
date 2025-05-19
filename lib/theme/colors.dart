@@ -13,7 +13,11 @@ class AppColors {
   static const Color blueGreyBorder = Color(0xFFB0BEC5);
   static const Color lightGreyBlue = Color(0xFFF2F6F9);
   static const Color greyBlue = Color(0xFFCFD8DC);
-  static const Color success = Color(0xFF4CAF50); // Hijau
-  static const Color error = Color(0xFFF44336);   // Merah
+  static const Color success = Color(0xFF4CAF50);
+  static const Color error = Color(0xFFF44336);
+  static const Color pending = Color(0xFFFFC107); 
+  static const Color cooking = Color(0xFFFF7043); 
+  static const Color delivering = Color(0xFF2196F3); 
+
 
 }

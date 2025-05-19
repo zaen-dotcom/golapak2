@@ -11,6 +11,7 @@ import 'providers/user_provider.dart';
 import 'screens/profile/keranjang.dart';
 import 'screens/splash_screen.dart';
 import 'theme/theme.dart';
+import 'screens/detailorder_screen.dart';
 
 void main() {
   runApp(const MyApp());
