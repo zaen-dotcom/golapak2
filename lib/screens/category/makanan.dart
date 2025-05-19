@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../components/cardproduct.dart';
 import '../../providers/cart_provider.dart';
-import '../../models/product_model.dart';
-import '../../services/product_service.dart';
+import '../../providers/product_provider.dart';
 
 class MakananScreen extends StatefulWidget {
   const MakananScreen({Key? key}) : super(key: key);
@@ -13,26 +12,23 @@ class MakananScreen extends StatefulWidget {
 }
 
 class _MakananScreenState extends State<MakananScreen> {
-  late Future<List<ProductModel>> makananList;
-
   @override
   void initState() {
     super.initState();
-    makananList = fetchMakanan();
+    Future.microtask(
+      () => Provider.of<MakananProvider>(context, listen: false).fetchMakanan(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<ProductModel>>(
-      future: makananList,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+    return Consumer<MakananProvider>(
+      builder: (context, makananProv, _) {
+        if (makananProv.isLoading) {
           return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          print('Error di MakananScreen: ${snapshot.error}');
-          return Center(child: Text('Terjadi kesalahan: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          print('Tidak ada data di MakananScreen');
+        } else if (makananProv.error != null) {
+          return Center(child: Text('Terjadi kesalahan: ${makananProv.error}'));
+        } else if (makananProv.makananList.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -48,54 +44,47 @@ class _MakananScreenState extends State<MakananScreen> {
             ),
           );
         } else {
-          final makananList = snapshot.data!;
-          print('Jumlah item di MakananScreen: ${makananList.length}');
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              print('Tinggi grid MakananScreen: ${constraints.maxHeight}');
-              print('Lebar grid MakananScreen: ${constraints.maxWidth}');
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: makananList.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                    childAspectRatio: 2 / 2.8,
-                  ),
-                  itemBuilder: (context, index) {
-                    final makanan = makananList[index];
-                    final productId = makanan.id.toString();
+          final makananList = makananProv.makananList;
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: makananList.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 2 / 2.8,
+              ),
+              itemBuilder: (context, index) {
+                final makanan = makananList[index];
+                final productId = makanan.id.toString();
 
-                    return Consumer<CartProvider>(
-                      builder: (context, cart, child) {
-                        final quantity = cart.getQuantity(productId, makanan.name);
-                        return CardProduct(
+                return Consumer<CartProvider>(
+                  builder: (context, cart, _) {
+                    final quantity = cart.getQuantity(productId, makanan.name);
+                    return CardProduct(
+                      title: makanan.name,
+                      price: 'Rp. ${makanan.mainCost.toInt()}',
+                      imageUrl: makanan.image,
+                      quantity: quantity,
+                      onIncrement: () {
+                        cart.addItem(
+                          id: productId,
                           title: makanan.name,
-                          price: 'Rp. ${makanan.mainCost.toInt()}',
                           imageUrl: makanan.image,
-                          quantity: quantity,
-                          onIncrement: () {
-                            cart.addItem(
-                              id: productId,
-                              title: makanan.name,
-                              imageUrl: makanan.image,
-                              price: makanan.mainCost.toDouble(),
-                            );
-                          },
-                          onDecrement: () {
-                            cart.removeItem(productId, makanan.name);
-                          },
+                          price: makanan.mainCost.toDouble(),
                         );
+                      },
+                      onDecrement: () {
+                        cart.removeItem(productId, makanan.name);
                       },
                     );
                   },
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         }
       },

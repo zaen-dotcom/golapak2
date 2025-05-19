@@ -1,34 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../theme/colors.dart';
 import '../../components/info_item.dart';
-import '../../models/user_model.dart';
-import '../../services/user_service.dart';
+import '../../providers/user_provider.dart';
 
-class InfoScreen extends StatefulWidget {
+class InfoScreen extends StatelessWidget {
   const InfoScreen({Key? key}) : super(key: key);
-
-  @override
-  State<InfoScreen> createState() => _InfoScreenState();
-}
-
-class _InfoScreenState extends State<InfoScreen> {
-  UserModel? user;
-
-  @override
-  void initState() {
-    super.initState();
-    loadUserData();
-  }
-
-  Future<void> loadUserData() async {
-    final result = await getUser();
-    if (mounted) {
-      setState(() {
-        user = result;
-      });
-    }
-  }
 
   Widget buildSkeletonItem(IconData icon, Color iconColor) {
     return Shimmer.fromColors(
@@ -69,6 +47,8 @@ class _InfoScreenState extends State<InfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context).user;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -122,19 +102,19 @@ class _InfoScreenState extends State<InfoScreen> {
                       InfoItem(
                         icon: Icons.person_outline,
                         iconColor: Colors.orange,
-                        text: 'FULL NAME\n${user!.name}',
+                        text: 'FULL NAME\n${user.name}',
                       ),
                       const SizedBox(height: 12),
                       InfoItem(
                         icon: Icons.email_outlined,
                         iconColor: Colors.blue,
-                        text: 'EMAIL\n${user!.email}',
+                        text: 'EMAIL\n${user.email}',
                       ),
                       const SizedBox(height: 12),
                       InfoItem(
                         icon: Icons.phone_outlined,
                         iconColor: Colors.lightBlue,
-                        text: 'PHONE NUMBER\n${user!.phoneNumber}',
+                        text: 'PHONE NUMBER\n${user.phoneNumber}',
                       ),
                     ],
           ),

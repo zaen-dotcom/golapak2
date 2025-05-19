@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+
 import '../../components/button.dart';
 import '../../components/addresscard.dart';
 import '../../providers/user_provider.dart';
+import '../../providers/address_provider.dart';
 import '../../services/user_service.dart';
 import 'add_alamat.dart';
 import 'update_alamat.dart';
@@ -17,50 +19,33 @@ class AlamatScreen extends StatefulWidget {
 }
 
 class _AlamatScreenState extends State<AlamatScreen> {
-  bool _isLoading = true;
-  List<Map<String, dynamic>> _addressList = [];
-
   @override
   void initState() {
     super.initState();
-    _loadAddresses();
+    Future.microtask(() {
+      final userId = Provider.of<UserProvider>(context, listen: false).userId;
+      if (userId != null) {
+        Provider.of<AlamatProvider>(context, listen: false).fetchAlamat(userId);
+      }
+    });
   }
 
-  Future<void> _loadAddresses() async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final userId = userProvider.userId;
-
-    if (userId == null) {
-      print('User ID tidak ditemukan');
-      setState(() {
-        _isLoading = false;
-      });
-      return;
+  Future<void> _refreshAlamat() async {
+    final userId = Provider.of<UserProvider>(context, listen: false).userId;
+    if (userId != null) {
+      await Provider.of<AlamatProvider>(
+        context,
+        listen: false,
+      ).fetchAlamat(userId);
     }
-
-    final addresses = await getAddress(userId);
-
-    List<Map<String, dynamic>> mainAddress = [];
-    List<Map<String, dynamic>> otherAddresses = [];
-
-    for (var address in addresses) {
-      if (address['main_address'] == 1) {
-        mainAddress.add(address);
-      } else {
-        otherAddresses.add(address);
-      }
-    }
-
-    mainAddress.addAll(otherAddresses);
-
-    setState(() {
-      _addressList = mainAddress;
-      _isLoading = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final alamatProvider = Provider.of<AlamatProvider>(context);
+    final isLoading = alamatProvider.isLoading;
+    final addressList = alamatProvider.alamatList;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -83,20 +68,18 @@ class _AlamatScreenState extends State<AlamatScreen> {
         ),
       ),
       body: RefreshIndicator(
-        onRefresh: _loadAddresses,
+        onRefresh: _refreshAlamat,
         color: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         displacement: 40.0,
         child:
-            _isLoading
+            isLoading
                 ? ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: 3,
-                  itemBuilder: (context, index) {
-                    return _buildSkeleton();
-                  },
+                  itemBuilder: (context, index) => _buildSkeleton(),
                 )
-                : _addressList.isEmpty
+                : addressList.isEmpty
                 ? ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
@@ -120,9 +103,9 @@ class _AlamatScreenState extends State<AlamatScreen> {
                 )
                 : ListView.builder(
                   padding: const EdgeInsets.all(16),
-                  itemCount: _addressList.length,
+                  itemCount: addressList.length,
                   itemBuilder: (context, index) {
-                    final item = _addressList[index];
+                    final item = addressList[index];
                     return AddressCard(
                       address: item['address'] ?? 'Alamat tidak tersedia',
                       name: item['name'] ?? 'Nama tidak tersedia',
@@ -141,20 +124,15 @@ class _AlamatScreenState extends State<AlamatScreen> {
                                   initialIsMain: item['main_address'] == 1,
                                 ),
                           ),
-                        ).then((_) {
-                          _loadAddresses();
-                        });
+                        ).then((_) => _refreshAlamat());
                       },
                       onDelete: () async {
                         final confirm = await showDialog<bool>(
                           context: context,
-                          barrierDismissible:
-                              false, // tidak bisa tap luar dialog untuk tutup
+                          barrierDismissible: false,
                           builder:
                               (context) => WillPopScope(
-                                onWillPop:
-                                    () async =>
-                                        false, // memblok tombol back Android
+                                onWillPop: () async => false,
                                 child: CustomAlert(
                                   title: 'Hapus Alamat',
                                   message:
@@ -165,8 +143,7 @@ class _AlamatScreenState extends State<AlamatScreen> {
                                   confirmText: 'Hapus',
                                   onConfirm:
                                       () => Navigator.of(context).pop(true),
-                                  isDestructive:
-                                      true, // opsional, untuk tombol warna khusus misalnya merah
+                                  isDestructive: true,
                                 ),
                               ),
                         );
@@ -174,7 +151,7 @@ class _AlamatScreenState extends State<AlamatScreen> {
                         if (confirm == true) {
                           try {
                             await deleteAddress(item['id']);
-                            _loadAddresses(); // refresh daftar alamat
+                            await _refreshAlamat();
                             await showDialog(
                               context: context,
                               barrierDismissible: false,
@@ -244,7 +221,7 @@ class _AlamatScreenState extends State<AlamatScreen> {
                   );
                 },
               ),
-            ).then((_) => _loadAddresses());
+            ).then((_) => _refreshAlamat());
           },
         ),
       ),

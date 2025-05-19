@@ -13,7 +13,6 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
-  DateTime? _lastTapTime;
 
   final List<Widget> _pages = const [
     HomeScreen(),
@@ -22,17 +21,10 @@ class _MainNavigationState extends State<MainNavigation> {
   ];
 
   void _onItemTapped(int index) {
-    final now = DateTime.now();
-
-    if (_lastTapTime == null ||
-        now.difference(_lastTapTime!) > const Duration(milliseconds: 1500)) {
-      _lastTapTime = now;
-
-      if (_selectedIndex != index) {
-        setState(() {
-          _selectedIndex = index;
-        });
-      }
+    if (_selectedIndex != index) {
+      setState(() {
+        _selectedIndex = index;
+      });
     }
   }
 
@@ -43,7 +35,7 @@ class _MainNavigationState extends State<MainNavigation> {
         duration: const Duration(milliseconds: 300),
         transitionBuilder: (Widget child, Animation<double> animation) {
           final inAnimation = Tween<Offset>(
-            begin: const Offset(0.1, 0), // slide horizontal dari kanan
+            begin: const Offset(0.1, 0),
             end: Offset.zero,
           ).animate(
             CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),

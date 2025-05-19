@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../components/menuitem.dart';
 import '../components/alertdialog.dart';
 import 'profile/infopribadi.dart';
@@ -6,13 +7,10 @@ import 'profile/alamat.dart';
 import 'profile/keranjang.dart';
 import 'profile/help.dart';
 import 'profile/pengaturan.dart';
-import '../services/user_service.dart';
 import '../services/auth_service.dart';
 import '../utils/token_manager.dart';
-import '../models/user_model.dart';
-import 'package:shimmer/shimmer.dart';
 import '../providers/user_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -22,34 +20,12 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  UserModel? _user;
-
   @override
   void initState() {
     super.initState();
-    _loadUserData();
-  }
-
-  Future<void> _loadUserData() async {
-    try {
-      final user = await getUser();
-
-      if (!mounted) return;
-
-      setState(() {
-        _user = user;
-      });
-
-      if (user != null) {
-        Provider.of<UserProvider>(context, listen: false).setUserId(user.id);
-      }
-    } catch (e) {
-      if (!mounted) return;
-
-      setState(() {
-        _user = null;
-      });
-    }
+    Future.microtask(() {
+      Provider.of<UserProvider>(context, listen: false).loadUser();
+    });
   }
 
   void _onLogout(BuildContext context) async {
@@ -63,14 +39,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             confirmText: 'OK',
             onConfirm: () async {
               final token = await TokenManager.getToken();
-
               if (token == null) {
                 Navigator.pushReplacementNamed(context, '/login');
               } else {
                 final result = await logout();
-
                 if (result['status'] == 'success') {
                   await TokenManager.removeToken();
+                  Provider.of<UserProvider>(context, listen: false).reset();
                   Navigator.pushReplacementNamed(context, '/login');
                 } else {
                   Navigator.pop(context);
@@ -90,6 +65,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final user = userProvider.user;
+    final isLoading = userProvider.isLoading;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       body: SafeArea(
@@ -101,7 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 5),
               Center(
                 child:
-                    _user == null
+                    isLoading || user == null
                         ? Shimmer.fromColors(
                           baseColor: Colors.grey[300]!,
                           highlightColor: Colors.grey[100]!,
@@ -123,7 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 20),
               Center(
                 child:
-                    _user == null
+                    isLoading || user == null
                         ? Shimmer.fromColors(
                           baseColor: Colors.grey[300]!,
                           highlightColor: Colors.grey[100]!,
@@ -134,7 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         )
                         : Text(
-                          _user!.name,
+                          user.name,
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -149,7 +128,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const InfoScreen()),
+                    MaterialPageRoute(builder: (_) => const InfoScreen()),
                   );
                 },
               ),
@@ -161,9 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const AlamatScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const AlamatScreen()),
                   );
                 },
               ),
@@ -175,7 +152,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const CartScreen()),
+                    MaterialPageRoute(builder: (_) => const CartScreen()),
                   );
                 },
               ),
@@ -187,7 +164,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const HelpScreen()),
+                    MaterialPageRoute(builder: (_) => const HelpScreen()),
                   );
                 },
               ),
@@ -199,9 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const SettingScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const SettingScreen()),
                   );
                 },
               ),

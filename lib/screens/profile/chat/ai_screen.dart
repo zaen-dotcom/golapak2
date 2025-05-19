@@ -37,7 +37,8 @@ class _AIScreenState extends State<AIScreen> with TickerProviderStateMixin {
     );
 
     _addMessage(
-      message: "Halo! Saya AI Assistant Golapak. Ada yang bisa saya bantu?",
+      message:
+          "Halo! Saya AI Assistant Golapak. Ada yang bisa saya bantu?\n\n⚠️ Catatan: Chat ini tidak disimpan dan akan hilang ketika Anda keluar dari halaman ini.",
       isUser: false,
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'screens/onboarding_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
@@ -8,8 +9,10 @@ import 'routes/main_navigation.dart';
 import 'screens/verifyotp_screen.dart';
 import 'providers/cart_provider.dart';
 import 'providers/user_provider.dart';
+import 'providers/address_provider.dart';
 import 'screens/profile/keranjang.dart';
 import 'screens/splash_screen.dart';
+import 'providers/product_provider.dart';
 import 'theme/theme.dart';
 
 void main() {
@@ -25,6 +28,9 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<CartProvider>(create: (_) => CartProvider()),
         ChangeNotifierProvider<UserProvider>(create: (_) => UserProvider()),
+        ChangeNotifierProvider<AlamatProvider>(create: (_) => AlamatProvider()),
+        ChangeNotifierProvider(create: (_) => MakananProvider()),
+        ChangeNotifierProvider(create: (_) => MinumanProvider()),
       ],
       child: MaterialApp(
         title: 'My App',
