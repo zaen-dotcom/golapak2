@@ -11,6 +11,7 @@ import '../services/auth_service.dart';
 import '../utils/token_manager.dart';
 import '../providers/user_provider.dart';
 import 'package:shimmer/shimmer.dart';
+import '../screens/profile/hubungikami.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -168,6 +169,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   );
                 },
               ),
+              const SizedBox(height: 5),
+              MenuItem(
+                icon: Icons.phone_android,
+                text: 'Hubungi Kami',
+                iconColor: Colors.red,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ContactUsScreen()),
+                  );
+                },
+              ),
+
               const SizedBox(height: 5),
               MenuItem(
                 icon: Icons.settings_outlined,
