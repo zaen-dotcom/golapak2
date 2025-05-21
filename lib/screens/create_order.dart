@@ -271,13 +271,12 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
 
       /// Tombol
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 34),
         child: CustomButton(
           text: 'KONFIRMASI PESANAN',
           onPressed: () {
             // logika nanti
           },
-
           isLoading: false,
         ),
       ),
