@@ -6,6 +6,7 @@ import '../providers/address_provider.dart';
 import '../components/card_cartproduct.dart';
 import '../providers/cart_provider.dart';
 import '../services/transaction_service.dart';
+import '../routes/main_navigation.dart';
 
 class CreateOrderScreen extends StatefulWidget {
   const CreateOrderScreen({Key? key}) : super(key: key);
@@ -66,9 +67,25 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   }
 
   Future<void> _loadRingkasanPembayaran() async {
-    setState(() => isLoadingSummary = true);
-
     final cartItems = Provider.of<CartProvider>(context, listen: false).items;
+
+    // Jika kosong, arahkan ke halaman utama
+    if (cartItems.isEmpty) {
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            transitionDuration: const Duration(milliseconds: 400),
+            pageBuilder: (_, __, ___) => const MainNavigation(),
+            transitionsBuilder: (_, animation, __, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() => isLoadingSummary = true);
 
     final menuList =
         cartItems.values.map((item) {
@@ -77,15 +94,14 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
 
     final result = await calculateTransaction(menuList);
 
-    if (result != null) {
+    if (mounted && result != null) {
       setState(() {
         totalHargaProduk = result['total_harga_produk'] ?? 0;
         biayaOngkir = result['biaya_ongkir'] ?? 0;
         totalBiayaPembayaran = result['total_biaya_pembayaran'] ?? 0;
+        isLoadingSummary = false;
       });
     }
-
-    setState(() => isLoadingSummary = false);
   }
 
   @override

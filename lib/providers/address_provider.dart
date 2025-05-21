@@ -7,7 +7,7 @@ class AlamatProvider with ChangeNotifier {
   bool _isLoading = false;
 
   List<Map<String, dynamic>> get alamatList => _alamatList;
-  Map<String, dynamic>? get selectedAlamat => _selectedAlamat; 
+  Map<String, dynamic>? get selectedAlamat => _selectedAlamat;
   bool get isLoading => _isLoading;
 
   Future<void> fetchAlamat(int userId) async {
@@ -31,8 +31,7 @@ class AlamatProvider with ChangeNotifier {
       mainAddress.addAll(otherAddresses);
       _alamatList = mainAddress;
 
-      // ✅ Auto set alamat utama sebagai default selected
-      if (mainAddress.isNotEmpty) {
+      if (_selectedAlamat == null && mainAddress.isNotEmpty) {
         _selectedAlamat = mainAddress.first;
       }
     } catch (e) {
