@@ -47,29 +47,46 @@ Future<Map<String, dynamic>> createOrder({
   }
 }
 
-Future<Map<String, dynamic>> calculateCartTotal(
-  List<Map<String, dynamic>> cartItems,
+Future<Map<String, dynamic>?> calculateTransaction(
+  List<Map<String, dynamic>> menuList,
 ) async {
+  final token = await TokenManager.getToken();
+
+  if (token == null) {
+    print('Token tidak ditemukan, user mungkin belum login');
+    return null;
+  }
+
   final url = Uri.parse('${ApiConfig.baseUrl}/transaction-calculate');
 
-  final response = await http.post(
-    url,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: jsonEncode({'menu': cartItems}),
-  );
+  final body = {'menu': menuList};
+  final encodedBody = jsonEncode(body);
 
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    if (data['status'] == 'success') {
-      return data['data'];
-    } else {
-      throw Exception(data['message'] ?? 'Calculate failed');
-    }
-  } else {
-    throw Exception(
-      'Failed to calculate cart total. Status code: ${response.statusCode}',
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: encodedBody,
     );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['status'] == 'success') {
+        return data['data'];
+      } else {
+        print('Error dari server: ${data['message']}');
+        return null;
+      }
+    } else {
+      print('Request gagal dengan status code: ${response.statusCode}');
+      return null;
+    }
+  } catch (e) {
+    print('Exception saat request: $e');
+    return null;
   }
 }

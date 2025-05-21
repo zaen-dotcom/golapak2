@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../components/button.dart';
-import '../components/addresscard.dart'; // Pastikan path yang sesuai
-import '../components/card_cartproduct.dart'; // Pastikan path yang sesuai
+import '../components/box_container.dart';
+import '../providers/address_provider.dart';
+import '../components/card_cartproduct.dart';
+import '../providers/cart_provider.dart';
+import '../services/transaction_service.dart';
 
 class CreateOrderScreen extends StatefulWidget {
   const CreateOrderScreen({Key? key}) : super(key: key);
@@ -11,15 +15,86 @@ class CreateOrderScreen extends StatefulWidget {
 }
 
 class _CreateOrderScreenState extends State<CreateOrderScreen> {
-  // Variabel untuk pilihan pembayaran
-  String? _paymentMethod = 'COD'; // Default pilihan adalah COD
+  String? _paymentMethod = 'COD';
+
+  int totalHargaProduk = 0;
+  int biayaOngkir = 0;
+  int totalBiayaPembayaran = 0;
+  bool isLoadingSummary = false;
+  late CartProvider _cartProvider;
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() {
+      final alamatProvider = Provider.of<AlamatProvider>(
+        context,
+        listen: false,
+      );
+      alamatProvider.fetchAlamat(1);
+
+      _cartProvider = Provider.of<CartProvider>(context, listen: false);
+      _cartProvider.addListener(_loadRingkasanPembayaran);
+
+      _loadRingkasanPembayaran();
+    });
+  }
+
+  @override
+  void dispose() {
+    _cartProvider.removeListener(_loadRingkasanPembayaran);
+    super.dispose();
+  }
+
+  Widget _buildSummaryRow(String label, int amount, {bool bold = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label),
+          Text(
+            'Rp ${amount.toString()}',
+            style: TextStyle(
+              fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _loadRingkasanPembayaran() async {
+    setState(() => isLoadingSummary = true);
+
+    final cartItems = Provider.of<CartProvider>(context, listen: false).items;
+
+    final menuList =
+        cartItems.values.map((item) {
+          return {'id': item.id, 'qty': item.quantity};
+        }).toList();
+
+    final result = await calculateTransaction(menuList);
+
+    if (result != null) {
+      setState(() {
+        totalHargaProduk = result['total_harga_produk'] ?? 0;
+        biayaOngkir = result['biaya_ongkir'] ?? 0;
+        totalBiayaPembayaran = result['total_biaya_pembayaran'] ?? 0;
+      });
+    }
+
+    setState(() => isLoadingSummary = false);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 0,
+        elevation: 0.5,
         centerTitle: true,
         title: const Text(
           'Keranjang Belanja',
@@ -38,159 +113,173 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Alamat Pengantaran
-            AddressCard(
-              address: 'Pisang Keju Gedangdut, Jl. Sumatra',
-              name: 'John Doe',
-              phone: '08123456789',
-              isMain: true,
-              onEdit: () {},
-              onDelete: () {},
+            /// Box 1: Alamat Pengiriman
+            Consumer<AlamatProvider>(
+              builder: (context, alamatProvider, child) {
+                final alamat = alamatProvider.selectedAlamat;
+                if (alamatProvider.isLoading) {
+                  return const WhiteBoxContainer(
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+
+                if (alamat == null) {
+                  return const WhiteBoxContainer(
+                    child: Text('Belum ada alamat yang dipilih.'),
+                  );
+                }
+
+                return WhiteBoxContainer(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Alamat Pengiriman',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        alamat['name'] ?? '',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(alamat['address'] ?? ''),
+                    ],
+                  ),
+                );
+              },
             ),
 
-            // Item List Menu
-            _buildCardProduct(
-              title: 'Choco Tiramisu',
-              price: '38.750',
-              imageUrl: 'https://example.com/image.jpg',
-              quantity: 1,
-              onIncrement: () {},
-              onDecrement: () {},
+            Consumer<CartProvider>(
+              builder: (context, cartProvider, child) {
+                final cartItems = cartProvider.items.values.toList();
+
+                if (cartItems.isEmpty) {
+                  return const WhiteBoxContainer(
+                    child: Text('Belum ada produk yang dipilih.'),
+                  );
+                }
+
+                return WhiteBoxContainer(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Daftar Produk',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ...cartItems.map(
+                        (item) => CardProduct(
+                          title: item.title,
+                          price: 'Rp ${item.price.toStringAsFixed(0)}',
+                          imageUrl: item.imageUrl,
+                          quantity: item.quantity,
+                          onIncrement: () {
+                            cartProvider.addItem(
+                              id: item.id,
+                              title: item.title,
+                              imageUrl: item.imageUrl,
+                              price: item.price,
+                            );
+                          },
+                          onDecrement: () {
+                            cartProvider.removeItem(item.id, item.title);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
 
-            _buildCardProduct(
-              title: 'Choco Choco',
-              price: '38.750',
-              imageUrl: 'https://example.com/image.jpg',
-              quantity: 1,
-              onIncrement: () {},
-              onDecrement: () {},
+            WhiteBoxContainer(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Ringkasan Pembayaran',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  if (isLoadingSummary)
+                    const Center(child: CircularProgressIndicator())
+                  else ...[
+                    _buildSummaryRow('Total Harga Produk', totalHargaProduk),
+                    _buildSummaryRow('Biaya Ongkir', biayaOngkir),
+                    const Divider(),
+                    _buildSummaryRow(
+                      'Total Pembayaran',
+                      totalBiayaPembayaran,
+                      bold: true,
+                    ),
+                  ],
+                ],
+              ),
             ),
 
-            // Ringkasan Pembayaran
-            _buildPaymentSummary(),
-
-            // Opsi Pembayaran
-            _buildPaymentOptions(),
+            /// Box 4: Metode Pembayaran
+            WhiteBoxContainer(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Metode Pembayaran',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  ListTile(
+                    title: const Text('COD (Bayar di tempat)'),
+                    leading: Radio<String>(
+                      value: 'COD',
+                      groupValue: _paymentMethod,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _paymentMethod = value;
+                        });
+                      },
+                    ),
+                  ),
+                  ListTile(
+                    title: const Text('Transfer Bank'),
+                    leading: Radio<String>(
+                      value: 'Transfer',
+                      groupValue: _paymentMethod,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _paymentMethod = value;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
-      // CustomButton di bawah body
+
+      /// Tombol
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(12.0),
         child: CustomButton(
-          text: 'Beli dan antar sekarang',
-          onPressed: () {}, // Ganti dengan logika yang sesuai
-          isLoading: false, // Set to true jika sedang loading
+          text: 'KONFIRMASI PESANAN',
+          onPressed: () {
+            // logika nanti
+          },
+
+          isLoading: false,
         ),
-      ),
-    );
-  }
-
-  // Helper Method untuk CardProduct dengan Border dan Padding
-  Widget _buildCardProduct({
-    required String title,
-    required String price,
-    required String imageUrl,
-    required int quantity,
-    required VoidCallback onIncrement,
-    required VoidCallback onDecrement,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(10), // Padding di dalam container
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey), // Garis pembatas
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: CardProduct(
-        title: title,
-        price: price,
-        imageUrl: imageUrl,
-        quantity: quantity,
-        onIncrement: onIncrement,
-        onDecrement: onDecrement,
-      ),
-    );
-  }
-
-  // Helper Method untuk Ringkasan Pembayaran
-  Widget _buildPaymentSummary() {
-    return Container(
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Ringkasan Pembayaran',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10),
-          const Text('Harga: 38.750'),
-          const Text('Biaya Penanganan dan Pengiriman: 19.500'),
-          const Divider(),
-          const Text(
-            'Total Pembayaran: 58.250',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10),
-        ],
-      ),
-    );
-  }
-
-  // Helper Method untuk Opsi Pembayaran (COD atau Transfer)
-  Widget _buildPaymentOptions() {
-    return Container(
-      padding: EdgeInsets.all(10),
-      margin: const EdgeInsets.only(
-        bottom: 10,
-        top: 10,
-      ), // Menambahkan margin top untuk jarak
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Pilih Opsi Pembayaran',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          ListTile(
-            title: const Text('COD (Cash On Delivery)'),
-            leading: Radio<String>(
-              value: 'COD',
-              groupValue: _paymentMethod,
-              onChanged: (String? value) {
-                setState(() {
-                  _paymentMethod = value;
-                });
-              },
-            ),
-          ),
-          ListTile(
-            title: const Text('Transfer Bank'),
-            leading: Radio<String>(
-              value: 'Transfer',
-              groupValue: _paymentMethod,
-              onChanged: (String? value) {
-                setState(() {
-                  _paymentMethod = value;
-                });
-              },
-            ),
-          ),
-        ],
       ),
     );
   }

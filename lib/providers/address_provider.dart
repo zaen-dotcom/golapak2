@@ -3,11 +3,11 @@ import '../services/user_service.dart';
 
 class AlamatProvider with ChangeNotifier {
   List<Map<String, dynamic>> _alamatList = [];
-  Map<String, dynamic>? _selectedAlamat; // ✅ Tambahan
+  Map<String, dynamic>? _selectedAlamat;
   bool _isLoading = false;
 
   List<Map<String, dynamic>> get alamatList => _alamatList;
-  Map<String, dynamic>? get selectedAlamat => _selectedAlamat; // ✅ Tambahan
+  Map<String, dynamic>? get selectedAlamat => _selectedAlamat; 
   bool get isLoading => _isLoading;
 
   Future<void> fetchAlamat(int userId) async {

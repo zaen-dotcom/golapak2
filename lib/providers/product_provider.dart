@@ -12,10 +12,10 @@ class MakananProvider extends ChangeNotifier {
   String? _error;
   String? get error => _error;
 
-  bool _hasFetched = false; // Flag untuk cek apakah sudah pernah fetch
+  bool _hasFetched = false; 
 
   Future<void> fetchMakanan() async {
-    if (_hasFetched) return; // Cegah fetch ulang jika sudah pernah fetch
+    if (_hasFetched) return; 
 
     _isLoading = true;
     _error = null;
@@ -23,7 +23,7 @@ class MakananProvider extends ChangeNotifier {
 
     try {
       _makananList = await productService.fetchMakanan();
-      _hasFetched = true; // Tandai sudah fetch
+      _hasFetched = true;
     } catch (e) {
       _error = e.toString();
       _makananList = [];
