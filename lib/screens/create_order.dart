@@ -8,6 +8,7 @@ import '../providers/cart_provider.dart';
 import '../services/transaction_service.dart';
 import '../routes/main_navigation.dart';
 import '../components/alertdialog.dart';
+import '../components/transfer_method.dart';
 
 class CreateOrderScreen extends StatefulWidget {
   const CreateOrderScreen({Key? key}) : super(key: key);
@@ -18,6 +19,7 @@ class CreateOrderScreen extends StatefulWidget {
 
 class _CreateOrderScreenState extends State<CreateOrderScreen> {
   String? _paymentMethod = 'COD';
+  String? selectedBank;
 
   int totalHargaProduk = 0;
   int biayaOngkir = 0;
@@ -25,7 +27,6 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   bool isLoadingSummary = false;
   late CartProvider _cartProvider;
 
-  // Fungsi format ribuan tanpa package intl
   String formatRibuan(int number) {
     final str = number.toString();
     final reg = RegExp(r'\B(?=(\d{3})+(?!\d))');
@@ -253,7 +254,6 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
               ),
             ),
 
-            /// Box 4: Metode Pembayaran
             WhiteBoxContainer(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,12 +270,13 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                       onChanged: (String? value) {
                         setState(() {
                           _paymentMethod = value;
+                          selectedBank = null;
                         });
                       },
                     ),
                   ),
                   ListTile(
-                    title: const Text('Transfer Bank'),
+                    title: const Text('Transfer'),
                     leading: Radio<String>(
                       value: 'Transfer',
                       groupValue: _paymentMethod,
@@ -286,6 +287,18 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                       },
                     ),
                   ),
+                  if (_paymentMethod == 'Transfer')
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12),
+                      child: TransferMethodsWidget(
+                        selectedBank: selectedBank,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedBank = value;
+                          });
+                        },
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -329,7 +342,10 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
             final response = await createOrder(
               menu: menuList,
               addressId: alamat['id'],
-              paymentMethod: _paymentMethod!.toLowerCase(),
+              paymentMethod:
+                  _paymentMethod == 'Transfer'
+                      ? selectedBank?.toLowerCase() ?? 'transfer'
+                      : _paymentMethod!.toLowerCase(),
             );
 
             if (response['status'] == 'success') {
