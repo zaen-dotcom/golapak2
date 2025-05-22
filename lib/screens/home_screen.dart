@@ -9,6 +9,7 @@ import '../theme/colors.dart';
 import 'dart:ui';
 import '../screens/profile/help.dart';
 import '../components/dot_indicator.dart';
+import 'search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -96,12 +97,12 @@ class _HomeScreenState extends State<HomeScreen>
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      body: Stack(
-        children: [
-          SafeArea(
-            child: GestureDetector(
-              onTap: () => _focusNode.unfocus(),
-              child: CustomScrollView(
+      body: SafeArea(
+        child: GestureDetector(
+          onTap: () => _focusNode.unfocus(),
+          child: Stack(
+            children: [
+              CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
                     child: Padding(
@@ -141,8 +142,41 @@ class _HomeScreenState extends State<HomeScreen>
                                     child: TextField(
                                       controller: _searchController,
                                       focusNode: _focusNode,
-                                      onTapOutside: (event) {
-                                        _focusNode.unfocus();
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            transitionDuration: const Duration(
+                                              milliseconds: 350,
+                                            ),
+                                            pageBuilder:
+                                                (
+                                                  context,
+                                                  animation,
+                                                  secondaryAnimation,
+                                                ) => SearchScreen(),
+                                            transitionsBuilder: (
+                                              context,
+                                              animation,
+                                              secondaryAnimation,
+                                              child,
+                                            ) {
+                                              return SlideTransition(
+                                                position: Tween<Offset>(
+                                                  begin: const Offset(
+                                                    0.0,
+                                                    -1.0,
+                                                  ),
+                                                  end: Offset.zero,
+                                                ).animate(animation),
+                                                child: FadeTransition(
+                                                  opacity: animation,
+                                                  child: child,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        );
                                       },
                                       decoration: InputDecoration(
                                         hintText: "Cari...",
@@ -250,32 +284,32 @@ class _HomeScreenState extends State<HomeScreen>
                   const SliverToBoxAdapter(child: SizedBox(height: 100)),
                 ],
               ),
-            ),
-          ),
-          Positioned(
-            left: 20,
-            right: 20,
-            bottom: MediaQuery.of(context).padding.bottom + 12,
-            child: AnimatedSlide(
-              offset:
-                  cartProvider.totalItems > 0
-                      ? Offset.zero
-                      : const Offset(0, 1),
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              child: AnimatedOpacity(
-                opacity: cartProvider.totalItems > 0 ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 300),
-                child: CustomButton(
-                  text: 'Keranjang (${cartProvider.totalItems})',
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/cart');
-                  },
+              Positioned(
+                left: 20,
+                right: 20,
+                bottom: MediaQuery.of(context).padding.bottom + 12,
+                child: AnimatedSlide(
+                  offset:
+                      cartProvider.totalItems > 0
+                          ? Offset.zero
+                          : const Offset(0, 1),
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  child: AnimatedOpacity(
+                    opacity: cartProvider.totalItems > 0 ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 300),
+                    child: CustomButton(
+                      text: 'Keranjang (${cartProvider.totalItems})',
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/cart');
+                      },
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
