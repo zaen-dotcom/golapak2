@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../components/card_history.dart';
 import '../providers/order_provider.dart';
 import 'package:intl/intl.dart';
+import '../screens/detail_order_screen.dart';
 
 class OrderScreen extends StatefulWidget {
   const OrderScreen({super.key});
@@ -17,6 +18,20 @@ class _OrderScreenState extends State<OrderScreen> {
     super.initState();
     Future.microtask(
       () => Provider.of<OrderProvider>(context, listen: false).loadOrders(),
+    );
+  }
+
+  void _navigateToDetail(BuildContext context) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 300),
+        pageBuilder: (_, animation, __) {
+          return FadeTransition(
+            opacity: animation,
+            child: const OrderDetailScreen(),
+          );
+        },
+      ),
     );
   }
 
@@ -42,12 +57,15 @@ class _OrderScreenState extends State<OrderScreen> {
             itemCount: sortedOrders.length,
             itemBuilder: (context, index) {
               final order = sortedOrders[index];
-              return OrderHistoryCard(
-                transactionCode: order.transactionCode,
-                totalQty: order.totalQty,
-                grandTotal: order.grandTotal,
-                date: DateFormat('yyyy-MM-dd HH:mm:ss').format(order.date),
-                status: order.status,
+              return GestureDetector(
+                onTap: () => _navigateToDetail(context),
+                child: OrderHistoryCard(
+                  transactionCode: order.transactionCode,
+                  totalQty: order.totalQty,
+                  grandTotal: order.grandTotal,
+                  date: DateFormat('yyyy-MM-dd HH:mm:ss').format(order.date),
+                  status: order.status,
+                ),
               );
             },
           );
