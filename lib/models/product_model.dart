@@ -23,7 +23,7 @@ class ProductModel {
       image:
           json['image'] != null && json['image'] != ''
               ? 'http://10.0.2.2:8000/storage/${json['image']}'
-              : 'http://10.0.2.2:8000/storage/default-image.png', 
+              : 'http://10.0.2.2:8000/storage/default-image.png',
       mainCost:
           json['main_cost'] != null
               ? (json['main_cost'] is num
