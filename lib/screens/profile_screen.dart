@@ -6,7 +6,6 @@ import 'profile/infopribadi.dart';
 import 'profile/alamat.dart';
 import 'profile/keranjang.dart';
 import 'profile/help.dart';
-import 'profile/pengaturan.dart';
 import '../services/auth_service.dart';
 import '../utils/token_manager.dart';
 import '../providers/user_provider.dart';
@@ -173,24 +172,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               MenuItem(
                 icon: Icons.phone_android,
                 text: 'Hubungi Kami',
-                iconColor: Colors.red,
+                iconColor: Colors.blueGrey,
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const ContactUsScreen()),
-                  );
-                },
-              ),
-
-              const SizedBox(height: 5),
-              MenuItem(
-                icon: Icons.settings_outlined,
-                text: 'Pengaturan',
-                iconColor: Colors.teal,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SettingScreen()),
                   );
                 },
               ),

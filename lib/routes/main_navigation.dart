@@ -5,14 +5,25 @@ import '../screens/profile/chat/ai_screen.dart';
 import '../routes/order_navigation.dart';
 
 class MainNavigation extends StatefulWidget {
-  const MainNavigation({super.key});
+  final int initialIndex; 
+
+  const MainNavigation({
+    super.key,
+    this.initialIndex = 0, 
+  });
 
   @override
   State<MainNavigation> createState() => _MainNavigationState();
 }
 
 class _MainNavigationState extends State<MainNavigation> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex; 
+  }
 
   final List<Widget> _pages = const [
     HomeScreen(),
@@ -46,7 +57,6 @@ class _MainNavigationState extends State<MainNavigation> {
             child: FadeTransition(opacity: animation, child: child),
           );
         },
-
         child: IndexedStack(
           key: ValueKey<int>(_selectedIndex),
           index: _selectedIndex,

@@ -7,6 +7,7 @@ import '../components/card_cartproduct.dart';
 import '../providers/cart_provider.dart';
 import '../services/transaction_service.dart';
 import '../routes/main_navigation.dart';
+import '../components/alertdialog.dart';
 
 class CreateOrderScreen extends StatefulWidget {
   const CreateOrderScreen({Key? key}) : super(key: key);
@@ -297,9 +298,77 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 34),
         child: CustomButton(
           text: 'KONFIRMASI PESANAN',
-          onPressed: () {
-            // logika nanti
+          onPressed: () async {
+            final cartItems = _cartProvider.items.values.toList();
+            final menuList =
+                cartItems
+                    .map((item) => {'id': item.id, 'qty': item.quantity})
+                    .toList();
+
+            final alamatProvider = Provider.of<AlamatProvider>(
+              context,
+              listen: false,
+            );
+            final alamat = alamatProvider.selectedAlamat;
+
+            if (alamat == null) {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder:
+                    (_) => CustomAlert(
+                      title: 'Gagal',
+                      message: 'Alamat belum dipilih.',
+                      confirmText: 'OK',
+                      onConfirm: () => Navigator.of(context).pop(),
+                    ),
+              );
+              return;
+            }
+
+            final response = await createOrder(
+              menu: menuList,
+              addressId: alamat['id'],
+              paymentMethod: _paymentMethod!.toLowerCase(),
+            );
+
+            if (response['status'] == 'success') {
+              if (!mounted) return;
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder:
+                    (_) => CustomAlert(
+                      title: 'Berhasil',
+                      message: 'Pesanan berhasil dibuat!',
+                      confirmText: 'Lihat Pesanan',
+                      onConfirm: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder:
+                                (_) => const MainNavigation(initialIndex: 1),
+                          ),
+                        );
+                      },
+                    ),
+              );
+            } else {
+              if (!mounted) return;
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder:
+                    (_) => CustomAlert(
+                      title: 'Gagal',
+                      message: response['message'] ?? 'Pesanan gagal dibuat.',
+                      confirmText: 'Tutup',
+                      onConfirm: () => Navigator.of(context).pop(),
+                    ),
+              );
+            }
           },
+
           isLoading: false,
         ),
       ),

@@ -4,46 +4,57 @@ import '../utils/token_manager.dart';
 import 'api_config.dart';
 
 Future<Map<String, dynamic>> createOrder({
-  required List<Map<String, dynamic>> menuItems,
+  required List<Map<String, dynamic>> menu,
   required int addressId,
+  required String paymentMethod,
+  String? accountNumber, 
 }) async {
-  final url = '${ApiConfig.baseUrl}/transaction-create';
+  final url = Uri.parse('${ApiConfig.baseUrl}/transaction-create');
+  final token = await TokenManager.getToken();
+
+  if (token == null) {
+    return {
+      'status': 'error',
+      'message': 'Token tidak tersedia. Silakan login ulang.',
+    };
+  }
 
   try {
-    final token = await TokenManager.getToken();
-    if (token == null) {
-      throw Exception('Token tidak ditemukan. Pengguna belum login.');
-    }
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    final body = {
+      'menu': menu,
+      'address_id': addressId,
+      'payment_method': paymentMethod,
+      if (accountNumber != null) 'account_number': accountNumber,
+    };
 
     final response = await http.post(
-      Uri.parse(url),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: json.encode({'menu': menuItems, 'address_id': addressId}),
+      url,
+      headers: headers,
+      body: jsonEncode(body),
     );
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data['status'] == 'success') {
-        return {
-          'success': true,
-          'transaction_id': data['data']['transaction_id'],
-          'transaction_code': data['data']['transaction_code'],
-        };
-      } else {
-        return {'success': false, 'message': data['message']};
-      }
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(response.body);
     } else {
-      final error = json.decode(response.body);
       return {
-        'success': false,
-        'message': error['message'] ?? 'Gagal membuat pesanan',
+        'status': 'error',
+        'message': 'Gagal membuat pesanan',
+        'code': response.statusCode,
+        'body': jsonDecode(response.body),
       };
     }
   } catch (e) {
-    return {'success': false, 'message': 'Terjadi kesalahan: $e'};
+    return {
+      'status': 'error',
+      'message': 'Terjadi kesalahan saat mengirim permintaan',
+      'error': e.toString(),
+    };
   }
 }
 
