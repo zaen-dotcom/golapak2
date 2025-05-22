@@ -12,14 +12,53 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
   List<ProductModel> searchResults = [];
+
+  String formatPrice(int price) {
+    final priceStr = price.toString();
+    final buffer = StringBuffer();
+    int count = 0;
+    for (int i = priceStr.length - 1; i >= 0; i--) {
+      buffer.write(priceStr[i]);
+      count++;
+      if (count == 3 && i != 0) {
+        buffer.write('.');
+        count = 0;
+      }
+    }
+    return buffer.toString().split('').reversed.join('');
+  }
 
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<MakananProvider>(context, listen: false).fetchMakanan();
-      Provider.of<MinumanProvider>(context, listen: false).fetchMinuman();
+      _searchFocusNode.requestFocus();
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final makananProvider = Provider.of<MakananProvider>(
+        context,
+        listen: false,
+      );
+      final minumanProvider = Provider.of<MinumanProvider>(
+        context,
+        listen: false,
+      );
+
+      await makananProvider.fetchMakanan();
+      await minumanProvider.fetchMinuman();
+
+      final allProducts = [
+        ...makananProvider.makananList,
+        ...minumanProvider.minumanList,
+      ];
+
+      setState(() {
+        searchResults = allProducts;
+      });
     });
   }
 
@@ -29,174 +68,157 @@ class _SearchScreenState extends State<SearchScreen> {
         searchResults = allProducts;
       } else {
         searchResults =
-            allProducts.where((product) {
-              return product.name.toLowerCase().contains(query.toLowerCase());
-            }).toList();
+            allProducts
+                .where(
+                  (product) =>
+                      product.name.toLowerCase().contains(query.toLowerCase()),
+                )
+                .toList();
       }
     });
   }
 
   @override
   void dispose() {
+    _searchFocusNode.dispose();
     _searchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => MakananProvider()),
-        ChangeNotifierProvider(create: (_) => MinumanProvider()),
-        ChangeNotifierProvider(create: (_) => CartProvider()),
-      ],
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          centerTitle: true,
-          title: const Text(
-            'Pencarian',
-            style: TextStyle(
-              color: Colors.black87,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
+    // Jangan buat MultiProvider di sini, asumsikan sudah ada di root
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Pencarian',
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
           ),
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios_new_rounded,
-              color: Colors.black87,
-            ),
-            onPressed: () => Navigator.pop(context),
+        ),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.black87,
           ),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(45),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Cari...',
-                  hintStyle: const TextStyle(color: Colors.black38),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade400),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 16,
-                  ),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: () {
-                      final allProducts = [
-                        ...Provider.of<MakananProvider>(
-                          context,
-                          listen: false,
-                        ).makananList,
-                        ...Provider.of<MinumanProvider>(
-                          context,
-                          listen: false,
-                        ).minumanList,
-                      ];
-                      _search(_searchController.text, allProducts);
-                    },
-                  ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(45),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: TextField(
+              controller: _searchController,
+              focusNode: _searchFocusNode,
+              decoration: InputDecoration(
+                hintText: 'Cari...',
+                hintStyle: const TextStyle(color: Colors.black38),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
                 ),
-                onChanged: (query) {
-                  final allProducts = [
-                    ...Provider.of<MakananProvider>(
-                      context,
-                      listen: false,
-                    ).makananList,
-                    ...Provider.of<MinumanProvider>(
-                      context,
-                      listen: false,
-                    ).minumanList,
-                  ];
-                  _search(query, allProducts);
-                },
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 16,
+                ),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () {
+                    final allProducts = [
+                      ...Provider.of<MakananProvider>(
+                        context,
+                        listen: false,
+                      ).makananList,
+                      ...Provider.of<MinumanProvider>(
+                        context,
+                        listen: false,
+                      ).minumanList,
+                    ];
+                    _search(_searchController.text, allProducts);
+                  },
+                ),
               ),
+              onChanged: (query) {
+                final allProducts = [
+                  ...Provider.of<MakananProvider>(
+                    context,
+                    listen: false,
+                  ).makananList,
+                  ...Provider.of<MinumanProvider>(
+                    context,
+                    listen: false,
+                  ).minumanList,
+                ];
+                _search(query, allProducts);
+              },
             ),
           ),
         ),
-        body: Consumer3<MakananProvider, MinumanProvider, CartProvider>(
-          builder: (
-            context,
-            makananProvider,
-            minumanProvider,
-            cartProvider,
-            child,
-          ) {
-            if (makananProvider.isLoading || minumanProvider.isLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
+      ),
+      body: Consumer3<MakananProvider, MinumanProvider, CartProvider>(
+        builder: (
+          context,
+          makananProvider,
+          minumanProvider,
+          cartProvider,
+          child,
+        ) {
+          if (makananProvider.isLoading || minumanProvider.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            if (makananProvider.error != null ||
-                minumanProvider.error != null) {
-              return Center(
-                child: Text(
-                  makananProvider.error ??
-                      minumanProvider.error ??
-                      'Terjadi kesalahan',
-                ),
-              );
-            }
-
-            final allProducts = [
-              ...makananProvider.makananList,
-              ...minumanProvider.minumanList,
-            ];
-
-            if (searchResults.isEmpty && allProducts.isNotEmpty) {
-              searchResults = allProducts;
-            }
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child:
-                  searchResults.isEmpty
-                      ? const Center(child: Text('Tidak ada hasil pencarian'))
-                      : ListView.builder(
-                        itemCount: searchResults.length,
-                        itemBuilder: (context, index) {
-                          final ProductModel product = searchResults[index];
-                          return CardProduct(
-                            title: product.name,
-                            price:
-                                product.mainCost
-                                    .toString(), // Untuk UI, gunakan int
-                            imageUrl: product.image,
-                            quantity: cartProvider.getQuantity(
-                              product.id
-                                  .toString(), // Konversi id ke String untuk CartProvider
-                              product.name,
-                            ),
-                            onIncrement: () {
-                              cartProvider.addItem(
-                                id:
-                                    product.id
-                                        .toString(), // Konversi id ke String untuk CartProvider
-                                title: product.name,
-                                imageUrl: product.image,
-                                price:
-                                    product
-                                        .mainCost, // Untuk CartProvider, gunakan double
-                              );
-                            },
-                            onDecrement: () {
-                              cartProvider.removeItem(
-                                product.id
-                                    .toString(), // Konversi id ke String untuk CartProvider
-                                product.name,
-                              );
-                            },
-                          );
-                        },
-                      ),
+          if (makananProvider.error != null || minumanProvider.error != null) {
+            return Center(
+              child: Text(
+                makananProvider.error ??
+                    minumanProvider.error ??
+                    'Terjadi kesalahan',
+              ),
             );
-          },
-        ),
+          }
+
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child:
+                searchResults.isEmpty
+                    ? const Center(child: Text('Tidak ada hasil pencarian'))
+                    : ListView.builder(
+                      itemCount: searchResults.length,
+                      itemBuilder: (context, index) {
+                        final ProductModel product = searchResults[index];
+                        return CardProduct(
+                          title: product.name,
+                          price: 'Rp. ${formatPrice(product.mainCost.toInt())}',
+                          imageUrl: product.image,
+                          quantity: cartProvider.getQuantity(
+                            product.id.toString(),
+                            product.name,
+                          ),
+                          onIncrement: () {
+                            cartProvider.addItem(
+                              id: product.id.toString(),
+                              title: product.name,
+                              imageUrl: product.image,
+                              price: product.mainCost,
+                            );
+                          },
+                          onDecrement: () {
+                            cartProvider.removeItem(
+                              product.id.toString(),
+                              product.name,
+                            );
+                          },
+                        );
+                      },
+                    ),
+          );
+        },
       ),
     );
   }

@@ -20,6 +20,23 @@ class _MinumanScreenState extends State<MinumanScreen> {
     );
   }
 
+  String formatPrice(int price) {
+    final priceStr = price.toString();
+    final buffer = StringBuffer();
+    int count = 0;
+
+    for (int i = priceStr.length - 1; i >= 0; i--) {
+      buffer.write(priceStr[i]);
+      count++;
+      if (count == 3 && i != 0) {
+        buffer.write('.');
+        count = 0;
+      }
+    }
+
+    return buffer.toString().split('').reversed.join('');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<MinumanProvider>(
@@ -66,7 +83,7 @@ class _MinumanScreenState extends State<MinumanScreen> {
                     final quantity = cart.getQuantity(productId, minuman.name);
                     return CardProduct(
                       title: minuman.name,
-                      price: 'Rp. ${minuman.mainCost.toInt()}',
+                      price: 'Rp. ${formatPrice(minuman.mainCost.toInt())}',
                       imageUrl: minuman.image,
                       quantity: quantity,
                       onIncrement: () {

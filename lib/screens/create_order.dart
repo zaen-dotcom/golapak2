@@ -24,6 +24,13 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   bool isLoadingSummary = false;
   late CartProvider _cartProvider;
 
+  // Fungsi format ribuan tanpa package intl
+  String formatRibuan(int number) {
+    final str = number.toString();
+    final reg = RegExp(r'\B(?=(\d{3})+(?!\d))');
+    return str.replaceAllMapped(reg, (match) => '.');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -56,7 +63,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
         children: [
           Text(label),
           Text(
-            'Rp ${amount.toString()}',
+            'Rp ${formatRibuan(amount)}',
             style: TextStyle(
               fontWeight: bold ? FontWeight.bold : FontWeight.normal,
             ),
@@ -88,9 +95,9 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     setState(() => isLoadingSummary = true);
 
     final menuList =
-        cartItems.values.map((item) {
-          return {'id': item.id, 'qty': item.quantity};
-        }).toList();
+        cartItems.values
+            .map((item) => {'id': item.id, 'qty': item.quantity})
+            .toList();
 
     final result = await calculateTransaction(menuList);
 
@@ -198,7 +205,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                       ...cartItems.map(
                         (item) => CardProduct(
                           title: item.title,
-                          price: 'Rp ${item.price.toStringAsFixed(0)}',
+                          price: 'Rp ${formatRibuan(item.price.toInt())}',
                           imageUrl: item.imageUrl,
                           quantity: item.quantity,
                           onIncrement: () {

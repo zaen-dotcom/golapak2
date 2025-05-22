@@ -20,6 +20,23 @@ class _MakananScreenState extends State<MakananScreen> {
     );
   }
 
+  String formatPrice(int price) {
+    final priceStr = price.toString();
+    final buffer = StringBuffer();
+    int count = 0;
+
+    for (int i = priceStr.length - 1; i >= 0; i--) {
+      buffer.write(priceStr[i]);
+      count++;
+      if (count == 3 && i != 0) {
+        buffer.write('.');
+        count = 0;
+      }
+    }
+
+    return buffer.toString().split('').reversed.join('');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<MakananProvider>(
@@ -66,7 +83,7 @@ class _MakananScreenState extends State<MakananScreen> {
                     final quantity = cart.getQuantity(productId, makanan.name);
                     return CardProduct(
                       title: makanan.name,
-                      price: 'Rp. ${makanan.mainCost.toInt()}',
+                      price: 'Rp. ${formatPrice(makanan.mainCost.toInt())}',
                       imageUrl: makanan.image,
                       quantity: quantity,
                       onIncrement: () {

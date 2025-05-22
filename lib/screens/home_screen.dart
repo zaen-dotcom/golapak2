@@ -142,6 +142,7 @@ class _HomeScreenState extends State<HomeScreen>
                                     child: TextField(
                                       controller: _searchController,
                                       focusNode: _focusNode,
+                                      readOnly: true,
                                       onTap: () {
                                         Navigator.push(
                                           context,
@@ -200,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen>
                                         ),
                                         focusedBorder: OutlineInputBorder(
                                           borderSide: const BorderSide(
-                                            color: Color(0xFFB0BEC5),
+                                            color: Colors.transparent,
                                             width: 1.2,
                                           ),
                                           borderRadius: BorderRadius.circular(

@@ -66,10 +66,7 @@ class CardProduct extends StatelessWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.remove, size: 18),
-                      color:
-                          Theme.of(
-                            context,
-                          ).colorScheme.primary, 
+                      color: Theme.of(context).colorScheme.primary,
                       onPressed: onDecrement,
                     ),
                     Text(
@@ -78,10 +75,7 @@ class CardProduct extends StatelessWidget {
                     ),
                     IconButton(
                       icon: const Icon(Icons.add, size: 18),
-                      color:
-                          Theme.of(
-                            context,
-                          ).colorScheme.primary,
+                      color: Theme.of(context).colorScheme.primary,
                       onPressed: onIncrement,
                     ),
                   ],

@@ -32,6 +32,25 @@ Future<void> showCustomAlertDialog({
   );
 }
 
+// Fungsi untuk format ribuan dengan titik
+String formatPrice(double price) {
+  final priceInt = price.toInt();
+  final priceStr = priceInt.toString();
+  final buffer = StringBuffer();
+  int count = 0;
+
+  for (int i = priceStr.length - 1; i >= 0; i--) {
+    buffer.write(priceStr[i]);
+    count++;
+    if (count == 3 && i != 0) {
+      buffer.write('.');
+      count = 0;
+    }
+  }
+
+  return buffer.toString().split('').reversed.join('');
+}
+
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
 
@@ -80,9 +99,11 @@ class _CartScreenState extends State<CartScreen> {
                         itemCount: cartItems.length,
                         itemBuilder: (context, index) {
                           final item = cartItems[index];
+                          final formattedPrice =
+                              'Rp. ${formatPrice(item.price)}';
                           return CardProduct(
                             title: item.title,
-                            price: 'Rp. ${item.price.toInt()}',
+                            price: formattedPrice,
                             imageUrl: item.imageUrl,
                             quantity: cart.getQuantity(item.id, item.title),
                             onIncrement: () {
