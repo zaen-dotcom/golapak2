@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../utils/token_manager.dart';
 import 'api_config.dart';
+import '../models/order_model.dart';
+import 'package:flutter/foundation.dart';
 
 Future<Map<String, dynamic>> createOrder({
   required List<Map<String, dynamic>> menu,
   required int addressId,
   required String paymentMethod,
-  String? accountNumber, 
+  String? accountNumber,
 }) async {
   final url = Uri.parse('${ApiConfig.baseUrl}/transaction-create');
   final token = await TokenManager.getToken();
@@ -100,4 +102,36 @@ Future<Map<String, dynamic>?> calculateTransaction(
     print('Exception saat request: $e');
     return null;
   }
+}
+
+List<Order> _parseOrders(String responseBody) {
+  final parsed = json.decode(responseBody)['data'] as List<dynamic>;
+  return parsed.map((json) => Order.fromJson(json)).toList();
+}
+
+Future<List<Order>?> fetchTransactionProgress() async {
+  final url = Uri.parse('${ApiConfig.baseUrl}/transaction-progress');
+
+  try {
+    final token = await TokenManager.getToken();
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      // parsing JSON di background thread untuk mencegah UI freeze
+      return compute(_parseOrders, response.body);
+    } else {
+      print('fetchTransactionProgress failed with status: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('fetchTransactionProgress error: $e');
+  }
+
+  return null;
 }

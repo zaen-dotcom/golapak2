@@ -350,6 +350,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
 
             if (response['status'] == 'success') {
               if (!mounted) return;
+
               showDialog(
                 context: context,
                 barrierDismissible: false,
@@ -359,6 +360,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                       message: 'Pesanan berhasil dibuat!',
                       confirmText: 'Lihat Pesanan',
                       onConfirm: () {
+                        _cartProvider.clearCart();
                         Navigator.of(context).pop();
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(

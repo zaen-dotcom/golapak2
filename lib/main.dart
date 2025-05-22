@@ -13,6 +13,7 @@ import 'providers/address_provider.dart';
 import 'screens/profile/keranjang.dart';
 import 'screens/splash_screen.dart';
 import 'providers/product_provider.dart';
+import 'package:golapak2/providers/order_provider.dart';
 import 'theme/theme.dart';
 
 void main() {
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<AlamatProvider>(create: (_) => AlamatProvider()),
         ChangeNotifierProvider(create: (_) => MakananProvider()),
         ChangeNotifierProvider(create: (_) => MinumanProvider()),
+        ChangeNotifierProvider(create: (_) => OrderProvider()),
       ],
       child: MaterialApp(
         title: 'My App',
