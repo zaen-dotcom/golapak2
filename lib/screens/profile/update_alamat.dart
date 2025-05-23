@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../components/text_field.dart';
 import '../../components/button.dart';
 import '../../providers/user_provider.dart';
@@ -12,6 +13,8 @@ class UpdateAddressScreen extends StatefulWidget {
   final String initialPhone;
   final String initialAddress;
   final bool initialIsMain;
+  final double initialLatitude;
+  final double initialLongitude;
 
   const UpdateAddressScreen({
     Key? key,
@@ -20,6 +23,8 @@ class UpdateAddressScreen extends StatefulWidget {
     required this.initialPhone,
     required this.initialAddress,
     required this.initialIsMain,
+    required this.initialLatitude,
+    required this.initialLongitude,
   }) : super(key: key);
 
   @override
@@ -34,6 +39,9 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen> {
   bool _isMainAddress = false;
   bool _isLoading = false;
 
+  GoogleMapController? _mapController;
+  LatLng? _selectedLatLng;
+
   @override
   void initState() {
     super.initState();
@@ -41,66 +49,79 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen> {
     _phoneController.text = widget.initialPhone;
     _addressController.text = widget.initialAddress;
     _isMainAddress = widget.initialIsMain;
+    _selectedLatLng = LatLng(widget.initialLatitude, widget.initialLongitude);
+  }
+
+  void _onMapCreated(GoogleMapController controller) {
+    _mapController = controller;
+    if (_selectedLatLng != null) {
+      _mapController!.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: _selectedLatLng!, zoom: 17.0),
+        ),
+      );
+    }
   }
 
   Future<void> _handleUpdate() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+    if (!_formKey.currentState!.validate() || _selectedLatLng == null) return;
 
-      final userId = Provider.of<UserProvider>(context, listen: false).userId;
+    setState(() => _isLoading = true);
+    final userId = Provider.of<UserProvider>(context, listen: false).userId;
 
-      if (userId == null) {
-        setState(() => _isLoading = false);
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder:
-              (context) => CustomAlert(
-                title: 'Gagal',
-                message: 'User ID tidak ditemukan.',
-                confirmText: 'OK',
-                onConfirm: () => Navigator.of(context).pop(),
-              ),
-        );
-        return;
-      }
-
-      final success = await updateAddress({
-        'id': widget.addressId,
-        'user_id': userId,
-        'name': _nameController.text,
-        'phone_number': _phoneController.text,
-        'address': _addressController.text,
-        'main_address': _isMainAddress,
-      });
-
+    if (userId == null) {
       setState(() => _isLoading = false);
-
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) {
-          if (success) {
-            return CustomAlert(
-              title: 'Berhasil',
-              message: 'Alamat berhasil diperbarui.',
-              confirmText: 'OK',
-              onConfirm: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop(true);
-              },
-            );
-          } else {
-            return CustomAlert(
+        builder:
+            (context) => CustomAlert(
               title: 'Gagal',
-              message: 'Gagal mengupdate alamat. Silakan coba lagi.',
-              confirmText: 'Tutup',
+              message: 'User ID tidak ditemukan.',
+              confirmText: 'OK',
               onConfirm: () => Navigator.of(context).pop(),
-            );
-          }
-        },
+            ),
       );
+      return;
     }
+
+    final success = await updateAddress({
+      'id': widget.addressId,
+      'user_id': userId,
+      'name': _nameController.text,
+      'phone_number': _phoneController.text,
+      'address': _addressController.text,
+      'main_address': _isMainAddress,
+      'latitude': _selectedLatLng!.latitude,
+      'longitude': _selectedLatLng!.longitude,
+    });
+
+    setState(() => _isLoading = false);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        if (success) {
+          return CustomAlert(
+            title: 'Berhasil',
+            message: 'Alamat berhasil diperbarui.',
+            confirmText: 'OK',
+            onConfirm: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop(true);
+            },
+          );
+        } else {
+          return CustomAlert(
+            title: 'Gagal',
+            message: 'Gagal mengupdate alamat. Silakan coba lagi.',
+            confirmText: 'Tutup',
+            onConfirm: () => Navigator.of(context).pop(),
+          );
+        }
+      },
+    );
   }
 
   Future<void> _onBackPressed() async {
@@ -192,6 +213,41 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen> {
                               ? 'Alamat wajib diisi'
                               : null,
                 ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Titik Lokasi (koordinat):',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 200,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      GoogleMap(
+                        onMapCreated: _onMapCreated,
+                        initialCameraPosition: CameraPosition(
+                          target: _selectedLatLng!,
+                          zoom: 17.0,
+                        ),
+                        myLocationEnabled: true,
+                        myLocationButtonEnabled: true,
+                        onCameraMove: (position) {
+                          setState(() {
+                            _selectedLatLng = position.target;
+                          });
+                        },
+                      ),
+                      // Pin statis di tengah layar, tanda lokasi yang dipilih
+                      const Icon(
+                        Icons.location_pin,
+                        size: 36,
+                        color: Colors.red,
+                      ),
+                    ],
+                  ),
+                ),
+
                 const SizedBox(height: 16),
                 Row(
                   children: [

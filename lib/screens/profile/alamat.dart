@@ -121,11 +121,27 @@ class _AlamatScreenState extends State<AlamatScreen> {
                                   initialName: item['name'] ?? '',
                                   initialPhone: item['phone_number'] ?? '',
                                   initialAddress: item['address'] ?? '',
-                                  initialIsMain: item['main_address'] == 1,
+                                  initialIsMain:
+                                      (item['main_address'] ?? 0) == 1,
+                                  initialLatitude:
+                                      item['latitude'] is String
+                                          ? double.tryParse(item['latitude']) ??
+                                              0.0
+                                          : (item['latitude']?.toDouble() ??
+                                              0.0),
+                                  initialLongitude:
+                                      item['longitude'] is String
+                                          ? double.tryParse(
+                                                item['longitude'],
+                                              ) ??
+                                              0.0
+                                          : (item['longitude']?.toDouble() ??
+                                              0.0),
                                 ),
                           ),
                         ).then((_) => _refreshAlamat());
                       },
+
                       onDelete: () async {
                         final confirm = await showDialog<bool>(
                           context: context,
