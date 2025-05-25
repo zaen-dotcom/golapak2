@@ -27,6 +27,8 @@ class AddressModel {
   final String name;
   final String phoneNumber;
   final String address;
+  final double latitude;
+  final double longitude;
   final bool isMainAddress;
 
   AddressModel({
@@ -35,6 +37,8 @@ class AddressModel {
     required this.name,
     required this.phoneNumber,
     required this.address,
+    required this.latitude,
+    required this.longitude,
     required this.isMainAddress,
   });
 
@@ -45,7 +49,28 @@ class AddressModel {
       name: json['name'],
       phoneNumber: json['phone_number'],
       address: json['address'],
-      isMainAddress: json['main_address'] == 1,
+      latitude:
+          (json['latitude'] is double)
+              ? json['latitude']
+              : double.tryParse(json['latitude'].toString()) ?? 0.0,
+      longitude:
+          (json['longitude'] is double)
+              ? json['longitude']
+              : double.tryParse(json['longitude'].toString()) ?? 0.0,
+      isMainAddress: json['main_address'] == true || json['main_address'] == 1,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'user_id': userId,
+      'name': name,
+      'phone_number': phoneNumber,
+      'address': address,
+      'latitude': latitude,
+      'longitude': longitude,
+      'main_address': isMainAddress,
+    };
   }
 }

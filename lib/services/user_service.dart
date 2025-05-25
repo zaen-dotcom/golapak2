@@ -40,6 +40,8 @@ Future<Map<String, dynamic>?> addAddress({
   required String name,
   required String phoneNumber,
   required String address,
+  required double latitude,
+  required double longitude,
   required bool isMainAddress,
 }) async {
   final token = await TokenManager.getToken();
@@ -60,6 +62,8 @@ Future<Map<String, dynamic>?> addAddress({
         'name': name,
         'phone_number': phoneNumber,
         'address': address,
+        'latitude': latitude,
+        'longitude': longitude,
         'main_address': isMainAddress,
       }),
     );
@@ -70,8 +74,13 @@ Future<Map<String, dynamic>?> addAddress({
         'status': jsonResponse['status'],
         'message': jsonResponse['message'],
       };
+    } else {
+      final errorResponse = json.decode(response.body);
+      print('Error ${response.statusCode}: ${errorResponse['message']}');
     }
-  } catch (e) {}
+  } catch (e) {
+    print('Request failed: $e');
+  }
 
   return null;
 }
@@ -161,7 +170,7 @@ Future<void> deleteAddress(int addressId) async {
   final url = Uri.parse('${ApiConfig.baseUrl}/delete-address/$addressId');
 
   try {
-    final response = await http.post(
+    final response = await http.delete(
       url,
       headers: {
         'Content-Type': 'application/json',
@@ -175,7 +184,6 @@ Future<void> deleteAddress(int addressId) async {
       if (data['status'] != 'success') {
         throw Exception(data['message'] ?? 'Gagal menghapus alamat.');
       }
-      // Tidak print apa pun jika sukses
     } else {
       throw Exception(
         'Gagal menghapus alamat. Status code: ${response.statusCode}',
