@@ -17,11 +17,16 @@ Future<Map<String, dynamic>> register(
     'password': password,
   };
   try {
+    print('URL: $url');
+    print('Body: ${json.encode(registrationData)}');
     final response = await http.post(
       Uri.parse(url),
       headers: {'Content-Type': 'application/json'},
       body: json.encode(registrationData),
     );
+
+    print('Status Code: ${response.statusCode}');
+    print('Response Body: ${response.body}');
     if (response.statusCode == 201) {
       final Map<String, dynamic> responseData = json.decode(response.body);
       return {
