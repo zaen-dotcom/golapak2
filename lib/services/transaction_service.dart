@@ -124,7 +124,7 @@ Future<List<Order>?> fetchTransactionProgress() async {
     );
 
     if (response.statusCode == 200) {
-      // parsing JSON di background thread untuk mencegah UI freeze
+
       return compute(_parseOrders, response.body);
     } else {
       print('fetchTransactionProgress failed with status: ${response.statusCode}');
