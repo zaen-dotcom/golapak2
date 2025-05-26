@@ -32,7 +32,6 @@ Future<void> showCustomAlertDialog({
   );
 }
 
-// Fungsi untuk format ribuan dengan titik
 String formatPrice(double price) {
   final priceInt = price.toInt();
   final priceStr = priceInt.toString();

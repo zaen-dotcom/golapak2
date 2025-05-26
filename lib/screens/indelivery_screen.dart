@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../components/card_history.dart';
 import '../providers/shipping_provider.dart';
+import '../screens/indelivery_detail_screen.dart';
 
 class InDeliveryScreen extends StatefulWidget {
   const InDeliveryScreen({super.key});
@@ -47,12 +48,22 @@ class _InDeliveryScreenState extends State<InDeliveryScreen> {
             itemBuilder: (context, index) {
               final shipping = sortedShippings[index];
 
-              return OrderHistoryCard(
-                transactionCode: shipping.transactionCode,
-                totalQty: shipping.totalQty,
-                grandTotal: shipping.grandTotal,
-                date: shipping.date,
-                status: shipping.status,
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const DeliveryDetailScreen(),
+                    ),
+                  );
+                },
+                child: OrderHistoryCard(
+                  transactionCode: shipping.transactionCode,
+                  totalQty: shipping.totalQty,
+                  grandTotal: shipping.grandTotal,
+                  date: shipping.date,
+                  status: shipping.status,
+                ),
               );
             },
           );
