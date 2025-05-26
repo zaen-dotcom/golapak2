@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../screens/order_screen.dart';
 import '../screens/history_screen.dart';
+import '../screens/indelivery_screen.dart';
 
 class OrderNavigation extends StatelessWidget {
   const OrderNavigation({super.key});
@@ -8,7 +9,7 @@ class OrderNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3, // Ubah jadi 3 tab
       child: Column(
         children: [
           const SizedBox(height: 17),
@@ -27,8 +28,7 @@ class OrderNavigation extends StatelessWidget {
             ),
             margin: const EdgeInsets.symmetric(horizontal: 16),
             child: TabBar(
-              dividerColor:
-                  Colors.transparent, 
+              dividerColor: Colors.transparent,
               indicator: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
@@ -54,6 +54,15 @@ class OrderNavigation extends StatelessWidget {
                 ),
                 Tab(
                   icon: Icon(
+                    Icons.local_shipping_outlined,
+                    size: 22,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  text: 'Dikirim',
+                  iconMargin: const EdgeInsets.only(bottom: 4),
+                ),
+                Tab(
+                  icon: Icon(
                     Icons.history_outlined,
                     size: 22,
                     color: Theme.of(context).colorScheme.primary,
@@ -65,7 +74,13 @@ class OrderNavigation extends StatelessWidget {
             ),
           ),
           const Expanded(
-            child: TabBarView(children: [OrderScreen(), HistoryScreen()]),
+            child: TabBarView(
+              children: [
+                OrderScreen(),
+                InDeliveryScreen(), // Tambahkan di index ke-1
+                HistoryScreen(),
+              ],
+            ),
           ),
         ],
       ),

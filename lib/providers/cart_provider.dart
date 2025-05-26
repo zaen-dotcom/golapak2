@@ -59,7 +59,6 @@ class CartProvider with ChangeNotifier {
     return _items[itemKey]?.quantity ?? 0;
   }
 
-  /// ✅ Method untuk menghapus semua item setelah transaksi sukses
   void clearCart() {
     _items.clear();
     notifyListeners();
