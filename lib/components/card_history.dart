@@ -36,6 +36,8 @@ class OrderHistoryCard extends StatelessWidget {
         return Colors.green;
       case 'cancelled':
         return Colors.red.shade400;
+      case 'on_delivery': 
+        return Colors.blue;
       default:
         return Colors.grey.shade400;
     }

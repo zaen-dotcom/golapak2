@@ -4,6 +4,7 @@ import '../utils/token_manager.dart';
 import 'api_config.dart';
 import '../models/order_model.dart';
 import 'package:flutter/foundation.dart';
+import '../models/shipping_model.dart';
 
 Future<Map<String, dynamic>> createOrder({
   required List<Map<String, dynamic>> menu,
@@ -117,21 +118,43 @@ Future<List<Order>?> fetchTransactionProgress() async {
 
     final response = await http.get(
       url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-      },
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
     );
 
     if (response.statusCode == 200) {
-
       return compute(_parseOrders, response.body);
     } else {
-      print('fetchTransactionProgress failed with status: ${response.statusCode}');
+      print(
+        'fetchTransactionProgress failed with status: ${response.statusCode}',
+      );
     }
   } catch (e) {
     print('fetchTransactionProgress error: $e');
   }
 
   return null;
+}
+
+Future<List<ShippingTransactionModel>> fetchShippingTransactions() async {
+  final token = await TokenManager.getToken();
+  final url = Uri.parse('${ApiConfig.baseUrl}/transaction-shipping');
+
+  final response = await http.get(
+    url,
+    headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
+  );
+
+  if (response.statusCode == 200) {
+    final jsonData = json.decode(response.body);
+    if (jsonData['status'] == 'success') {
+      List data = jsonData['data'];
+      return data
+          .map((item) => ShippingTransactionModel.fromJson(item))
+          .toList();
+    } else {
+      throw Exception('Gagal mengambil data pengiriman');
+    }
+  } else {
+    throw Exception('Server error: ${response.statusCode}');
+  }
 }

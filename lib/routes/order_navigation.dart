@@ -9,7 +9,7 @@ class OrderNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3, // Ubah jadi 3 tab
+      length: 3, 
       child: Column(
         children: [
           const SizedBox(height: 17),
@@ -77,7 +77,7 @@ class OrderNavigation extends StatelessWidget {
             child: TabBarView(
               children: [
                 OrderScreen(),
-                InDeliveryScreen(), // Tambahkan di index ke-1
+                InDeliveryScreen(),
                 HistoryScreen(),
               ],
             ),
