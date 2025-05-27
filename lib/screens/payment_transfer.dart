@@ -32,6 +32,7 @@ class PaymentTransferScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
+        automaticallyImplyLeading: false, 
         title: const Text(
           'Selesaikan Pembayaran',
           style: TextStyle(
@@ -40,14 +41,8 @@ class PaymentTransferScreen extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: Colors.black87,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
       ),
+
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
