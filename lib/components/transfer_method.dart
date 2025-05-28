@@ -1,15 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../utils/transfer_data.dart';
 
-class TransferMethodsWidget extends StatelessWidget {
+class ChooseTransferMethodPage extends StatefulWidget {
+  final int totalAmount;
   final String? selectedBank;
-  final Function(String?) onChanged;
+  final ValueChanged<String?>? onChanged;
 
-  const TransferMethodsWidget({
-    super.key,
-    required this.selectedBank,
-    required this.onChanged,
-  });
+  const ChooseTransferMethodPage({
+    Key? key,
+    required this.totalAmount,
+    this.selectedBank,
+    this.onChanged,
+  }) : super(key: key);
+
+  @override
+  _ChooseTransferMethodPageState createState() =>
+      _ChooseTransferMethodPageState();
+}
+
+class _ChooseTransferMethodPageState extends State<ChooseTransferMethodPage> {
+  late String? selectedBank;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedBank = widget.selectedBank;
+  }
 
   IconData _getBankIcon(String name) {
     switch (name) {
@@ -18,7 +35,7 @@ class TransferMethodsWidget extends StatelessWidget {
       case 'BRI':
         return FontAwesomeIcons.buildingColumns;
       case 'BCA':
-        return FontAwesomeIcons.university;
+        return FontAwesomeIcons.buildingColumns;
       default:
         return FontAwesomeIcons.moneyBill;
     }
@@ -26,29 +43,28 @@ class TransferMethodsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, String>> methods = [
-      {'name': 'DANA', 'rekening': '0812-3456-7890'},
-      {'name': 'BRI', 'rekening': '1234 5678 9012 3456'},
-      {'name': 'BCA', 'rekening': '9876 5432 1098 7654'},
-    ];
-
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children:
-          methods.map((method) {
-            final icon = _getBankIcon(method['name']!);
-
+          transferMethods.map((method) {
+            final name = method['name']!;
             return ListTile(
               leading: Radio<String>(
-                value: method['name']!,
+                value: name,
                 groupValue: selectedBank,
-                onChanged: onChanged,
+                onChanged: (val) {
+                  setState(() {
+                    selectedBank = val;
+                  });
+                  if (widget.onChanged != null) {
+                    widget.onChanged!(val);
+                  }
+                },
               ),
               title: Row(
                 children: [
-                  FaIcon(icon, size: 20, color: Colors.blue[800]),
+                  FaIcon(_getBankIcon(name), size: 20, color: Colors.blue[800]),
                   const SizedBox(width: 8),
-                  Text(method['name']!),
+                  Text(name),
                 ],
               ),
             );

@@ -8,7 +8,9 @@ import '../providers/cart_provider.dart';
 import '../services/transaction_service.dart';
 import '../routes/main_navigation.dart';
 import '../components/alertdialog.dart';
+import '../screens/payment_transfer.dart';
 import '../components/transfer_method.dart';
+import '../utils/transfer_data.dart';
 
 class CreateOrderScreen extends StatefulWidget {
   const CreateOrderScreen({Key? key}) : super(key: key);
@@ -290,12 +292,37 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                   if (_paymentMethod == 'Transfer')
                     Padding(
                       padding: const EdgeInsets.only(left: 12),
-                      child: TransferMethodsWidget(
+                      child: ChooseTransferMethodPage(
+                        totalAmount: totalBiayaPembayaran,
                         selectedBank: selectedBank,
                         onChanged: (value) {
                           setState(() {
                             selectedBank = value;
                           });
+
+                          if (_paymentMethod == 'Transfer' && value != null) {
+                            final bankData = transferMethods.firstWhere(
+                              (element) => element['name'] == value,
+                              orElse: () => {},
+                            );
+
+                            final rekening =
+                                bankData['rekening'] ?? 'Tidak diketahui';
+                            final atasNama =
+                                bankData['atas_nama'] ?? 'Tidak diketahui';
+
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => PaymentTransferScreen(
+                                      bankName: value,
+                                      accountNumber: rekening,
+                                      accountName: atasNama,
+                                      totalAmount: totalBiayaPembayaran,
+                                    ),
+                              ),
+                            );
+                          }
                         },
                       ),
                     ),
@@ -339,13 +366,26 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
               return;
             }
 
+            String? accountNumber;
+
+            if (_paymentMethod == 'Transfer' && selectedBank != null) {
+              final bankData = transferMethods.firstWhere(
+                (element) => element['name'] == selectedBank,
+                orElse: () => {},
+              );
+              accountNumber = bankData['rekening'];
+            }
+
+            final paymentMethodToSend =
+                _paymentMethod == 'Transfer'
+                    ? 'transfer'
+                    : _paymentMethod!.toLowerCase();
+
             final response = await createOrder(
               menu: menuList,
               addressId: alamat['id'],
-              paymentMethod:
-                  _paymentMethod == 'Transfer'
-                      ? selectedBank?.toLowerCase() ?? 'transfer'
-                      : _paymentMethod!.toLowerCase(),
+              paymentMethod: paymentMethodToSend,
+              accountNumber: accountNumber,
             );
 
             if (response['status'] == 'success') {

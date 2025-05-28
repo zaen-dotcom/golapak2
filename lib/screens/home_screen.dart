@@ -10,6 +10,7 @@ import 'dart:ui';
 import '../screens/profile/help.dart';
 import '../components/dot_indicator.dart';
 import 'search_screen.dart';
+import '../providers/product_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -53,6 +54,17 @@ class _HomeScreenState extends State<HomeScreen>
         );
       }
     });
+  }
+
+  Future<void> _handleRefresh() async {
+    await Provider.of<MakananProvider>(
+      context,
+      listen: false,
+    ).fetchMakanan(forceRefresh: true);
+    await Provider.of<MinumanProvider>(
+      context,
+      listen: false,
+    ).fetchMinuman(forceRefresh: true);
   }
 
   @override
@@ -102,189 +114,197 @@ class _HomeScreenState extends State<HomeScreen>
           onTap: () => _focusNode.unfocus(),
           child: Stack(
             children: [
-              CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              height: 50,
-                              decoration: BoxDecoration(
-                                color: AppColors.lightGreyBlue,
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    spreadRadius: 2,
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.search,
-                                    color: Colors.black,
-                                    size: 22,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: TextField(
-                                      controller: _searchController,
-                                      focusNode: _focusNode,
-                                      readOnly: true,
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            transitionDuration: const Duration(
-                                              milliseconds: 350,
-                                            ),
-                                            pageBuilder:
-                                                (
-                                                  context,
-                                                  animation,
-                                                  secondaryAnimation,
-                                                ) => SearchScreen(),
-                                            transitionsBuilder: (
-                                              context,
-                                              animation,
-                                              secondaryAnimation,
-                                              child,
-                                            ) {
-                                              return SlideTransition(
-                                                position: Tween<Offset>(
-                                                  begin: const Offset(
-                                                    0.0,
-                                                    -1.0,
+              RefreshIndicator(
+                onRefresh: _handleRefresh,
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  slivers: [
+                    // search bar
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: AppColors.lightGreyBlue,
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      spreadRadius: 2,
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.search,
+                                      color: Colors.black,
+                                      size: 22,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _searchController,
+                                        focusNode: _focusNode,
+                                        readOnly: true,
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              transitionDuration:
+                                                  const Duration(
+                                                    milliseconds: 350,
                                                   ),
-                                                  end: Offset.zero,
-                                                ).animate(animation),
-                                                child: FadeTransition(
-                                                  opacity: animation,
-                                                  child: child,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        );
-                                      },
-                                      decoration: InputDecoration(
-                                        hintText: "Cari...",
-                                        hintStyle: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                        ),
-                                        border: InputBorder.none,
-                                        filled: true,
-                                        fillColor: Colors.transparent,
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                              vertical: 12,
-                                              horizontal: 8,
+                                              pageBuilder:
+                                                  (
+                                                    context,
+                                                    animation,
+                                                    secondaryAnimation,
+                                                  ) => SearchScreen(),
+                                              transitionsBuilder: (
+                                                context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child,
+                                              ) {
+                                                return SlideTransition(
+                                                  position: Tween<Offset>(
+                                                    begin: const Offset(
+                                                      0.0,
+                                                      -1.0,
+                                                    ),
+                                                    end: Offset.zero,
+                                                  ).animate(animation),
+                                                  child: FadeTransition(
+                                                    opacity: animation,
+                                                    child: child,
+                                                  ),
+                                                );
+                                              },
                                             ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide.none,
-                                          borderRadius: BorderRadius.circular(
-                                            12,
+                                          );
+                                        },
+                                        decoration: InputDecoration(
+                                          hintText: "Cari...",
+                                          hintStyle: const TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 14,
                                           ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderSide: const BorderSide(
-                                            color: Colors.transparent,
-                                            width: 1.2,
+                                          border: InputBorder.none,
+                                          filled: true,
+                                          fillColor: Colors.transparent,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                vertical: 12,
+                                                horizontal: 8,
+                                              ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderSide: BorderSide.none,
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                           ),
-                                          borderRadius: BorderRadius.circular(
-                                            12,
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: const BorderSide(
+                                              color: Colors.transparent,
+                                              width: 1.2,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: AppColors.lightGreyBlue,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.support_agent_rounded,
-                                color: Colors.black,
-                                size: 26,
+                            const SizedBox(width: 10),
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: AppColors.lightGreyBlue,
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              onPressed: () => _navigateToHelpScreen(context),
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.support_agent_rounded,
+                                  color: Colors.black,
+                                  size: 26,
+                                ),
+                                onPressed: () => _navigateToHelpScreen(context),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      child: PageView.builder(
-                        controller: _pageController,
-                        itemCount: _bannerCount,
-                        onPageChanged: (index) {
-                          setState(() {
-                            _currentBanner = index;
-                          });
-                        },
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                            ),
-                            child: BannerPlaceholder(
-                              imageUrl: _bannerUrls[index],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: DotIndicator(
-                      currentIndex: _currentBanner,
-                      dotCount: _bannerCount,
-                    ),
-                  ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 20)),
-                  const SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Text(
-                        'Kategori Menu',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          ],
                         ),
                       ),
                     ),
-                  ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 15)),
-                  const SliverToBoxAdapter(child: CategoryScreen()),
-                  const SliverToBoxAdapter(child: SizedBox(height: 100)),
-                ],
+                    // banner
+                    SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.3,
+                        child: PageView.builder(
+                          controller: _pageController,
+                          itemCount: _bannerCount,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _currentBanner = index;
+                            });
+                          },
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                              ),
+                              child: BannerPlaceholder(
+                                imageUrl: _bannerUrls[index],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: DotIndicator(
+                        currentIndex: _currentBanner,
+                        dotCount: _bannerCount,
+                      ),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                    const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          'Kategori Menu',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 15)),
+                    const SliverToBoxAdapter(child: CategoryScreen()),
+                    const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                  ],
+                ),
               ),
+              // tombol keranjang
               Positioned(
                 left: 20,
                 right: 20,

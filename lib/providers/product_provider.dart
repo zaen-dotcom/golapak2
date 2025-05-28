@@ -12,10 +12,10 @@ class MakananProvider extends ChangeNotifier {
   String? _error;
   String? get error => _error;
 
-  bool _hasFetched = false; 
+  bool _hasFetched = false;
 
-  Future<void> fetchMakanan() async {
-    if (_hasFetched) return; 
+  Future<void> fetchMakanan({bool forceRefresh = false}) async {
+    if (_hasFetched && !forceRefresh) return;
 
     _isLoading = true;
     _error = null;
@@ -46,8 +46,8 @@ class MinumanProvider extends ChangeNotifier {
 
   bool _hasFetched = false;
 
-  Future<void> fetchMinuman() async {
-    if (_hasFetched) return;
+  Future<void> fetchMinuman({bool forceRefresh = false}) async {
+    if (_hasFetched && !forceRefresh) return;
 
     _isLoading = true;
     _error = null;
