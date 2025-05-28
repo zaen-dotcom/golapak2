@@ -142,14 +142,27 @@ class _OrderScreenState extends State<OrderScreen> {
                     if (_canCancel(order.status))
                       Positioned(
                         right: 24,
-                        bottom: 16,
+                        bottom: 23,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            minimumSize: const Size(0, 40),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            visualDensity: VisualDensity.compact,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
                           onPressed:
                               () => _handleCancelOrder(context, order.id),
-                          child: const Text('Cancel'),
+                          child: const Text(
+                            'Batalkan',
+                            style: TextStyle(fontSize: 14),
+                          ),
                         ),
                       ),
                   ],
