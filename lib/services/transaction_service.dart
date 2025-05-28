@@ -4,7 +4,6 @@ import '../utils/token_manager.dart';
 import 'api_config.dart';
 import '../models/order_model.dart';
 import 'package:flutter/foundation.dart';
-import '../models/orderdetail_model.dart';
 
 Future<Map<String, dynamic>> createOrder({
   required List<Map<String, dynamic>> menu,
@@ -147,7 +146,7 @@ Future<List<Order>?> fetchTransactionProgress() async {
 }
 
 Future<Map<String, dynamic>> fetchOrderDetailFromApi(String orderId) async {
-  final url = Uri.parse('${ApiConfig.baseUrl}/transaction***********************************************************************************************************/$orderId');
+  final url = Uri.parse('${ApiConfig.baseUrl}/transaction/$orderId');
   final token = await TokenManager.getToken();
 
   final response = await http.get(
