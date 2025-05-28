@@ -24,4 +24,14 @@ class OrderProvider with ChangeNotifier {
     _isLoading = false;
     notifyListeners();
   }
+
+  Future<Map<String, dynamic>> cancelOrder(int orderId) async {
+    final response = await cancelTransaction(orderId);
+
+    if (response['status'] == 'success') {
+      await loadOrders();
+    }
+
+    return response;
+  }
 }

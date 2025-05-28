@@ -158,3 +158,26 @@ Future<List<ShippingTransactionModel>> fetchShippingTransactions() async {
     throw Exception('Server error: ${response.statusCode}');
   }
 }
+
+Future<Map<String, dynamic>> cancelTransaction(int transactionId) async {
+  final token = await TokenManager.getToken(); 
+  final url = Uri.parse('${ApiConfig.baseUrl}/transaction-cancel');
+
+  final response = await http.post(
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+    body: json.encode({'id': transactionId}),
+  );
+
+  if (response.statusCode == 200) {
+    return json.decode(response.body);
+  } else {
+    return {
+      'status': 'error',
+      'message': 'Gagal membatalkan pesanan',
+    };
+  }
+}
