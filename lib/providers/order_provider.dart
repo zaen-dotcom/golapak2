@@ -13,6 +13,7 @@ class OrderProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
+    try {
     final data = await fetchTransactionProgress();
 
     if (data != null) {
@@ -20,6 +21,11 @@ class OrderProvider with ChangeNotifier {
     } else {
       _orders = [];
     }
+  } catch (e, stack) {
+    print('Gagal load orders: $e');
+    print(stack); // Ini buat log lengkap
+    _orders = [];
+  }
 
     _isLoading = false;
     notifyListeners();

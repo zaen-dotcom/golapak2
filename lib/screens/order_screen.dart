@@ -15,25 +15,25 @@ class OrderScreen extends StatefulWidget {
 class _OrderScreenState extends State<OrderScreen> {
   @override
   void initState() {
-    super.initState();
-    Future.microtask(
-      () => Provider.of<OrderProvider>(context, listen: false).loadOrders(),
-    );
-  }
+  super.initState();
+  Future.microtask(() =>
+      Provider.of<OrderProvider>(context, listen: false).loadOrders());
+}
 
-  void _navigateToDetail(BuildContext context) {
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 300),
-        pageBuilder: (_, animation, __) {
-          return FadeTransition(
-            opacity: animation,
-            child: const OrderDetailScreen(),
-          );
-        },
-      ),
-    );
-  }
+      void _navigateToDetail(BuildContext context, String orderId) {
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            transitionDuration: const Duration(milliseconds: 300),
+            pageBuilder: (_, animation, __) {
+              return FadeTransition(
+                opacity: animation,
+                child: OrderDetailScreen(orderId: orderId),
+              );
+            },
+          ),
+        );
+      }
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +58,7 @@ class _OrderScreenState extends State<OrderScreen> {
             itemBuilder: (context, index) {
               final order = sortedOrders[index];
               return GestureDetector(
-                onTap: () => _navigateToDetail(context),
+                onTap: () => _navigateToDetail(context, order.id.toString()),
                 child: OrderHistoryCard(
                   transactionCode: order.transactionCode,
                   totalQty: order.totalQty,

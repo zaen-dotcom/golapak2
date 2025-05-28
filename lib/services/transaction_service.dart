@@ -4,6 +4,7 @@ import '../utils/token_manager.dart';
 import 'api_config.dart';
 import '../models/order_model.dart';
 import 'package:flutter/foundation.dart';
+import '../models/orderdetail_model.dart';
 
 Future<Map<String, dynamic>> createOrder({
   required List<Map<String, dynamic>> menu,
@@ -105,10 +106,19 @@ Future<Map<String, dynamic>?> calculateTransaction(
 }
 
 List<Order> _parseOrders(String responseBody) {
-  final parsed = json.decode(responseBody)['data'] as List<dynamic>;
-  return parsed.map((json) => Order.fromJson(json)).toList();
-}
+  final parsed = jsonDecode(responseBody);
 
+  if (parsed is List) {
+    return parsed.map<Order>((json) => Order.fromJson(json)).toList();
+  } else if (parsed is Map && parsed.containsKey('data')) {
+    return (parsed['data'] as List)
+        .map<Order>((json) => Order.fromJson(json))
+        .toList();
+  } else {
+    print('Format data tidak dikenali: $parsed');
+    return [];
+  }
+}
 Future<List<Order>?> fetchTransactionProgress() async {
   final url = Uri.parse('${ApiConfig.baseUrl}/transaction-progress');
 
@@ -135,3 +145,24 @@ Future<List<Order>?> fetchTransactionProgress() async {
 
   return null;
 }
+
+Future<Map<String, dynamic>> fetchOrderDetailFromApi(String orderId) async {
+  final url = Uri.parse('${ApiConfig.baseUrl}/transaction***********************************************************************************************************/$orderId');
+  final token = await TokenManager.getToken();
+
+  final response = await http.get(
+    url,
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Accept': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    return json.decode(response.body);
+  } else {
+    throw Exception('Failed to load order detail');
+  }
+}
+
+
