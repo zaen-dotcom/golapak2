@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import '../../components/cardproduct.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/product_provider.dart';
+import '../../utils/token_manager.dart';
+import '../../screens/login_screen.dart';
+import '../../components/alertdialog.dart';
 
 class MakananScreen extends StatefulWidget {
   const MakananScreen({Key? key}) : super(key: key);
@@ -12,12 +15,79 @@ class MakananScreen extends StatefulWidget {
 }
 
 class _MakananScreenState extends State<MakananScreen> {
+  bool _hasShownAlert = false;
+
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-      () => Provider.of<MakananProvider>(context, listen: false).fetchMakanan(),
-    );
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final token = await TokenManager.getToken();
+    debugPrint('Token yang didapat: $token');
+
+    if (token == null || token.isEmpty) {
+      _showSessionExpiredAlert();
+      return;
+    }
+
+    try {
+      await Provider.of<MakananProvider>(context, listen: false).fetchMakanan();
+    } catch (e) {
+      final errorMsg = e.toString();
+      debugPrint('Error saat fetch makanan: $errorMsg');
+
+      if (errorMsg.contains('401') || errorMsg.contains('Unauthenticated')) {
+        _showSessionExpiredAlert();
+      } else {
+        _showGeneralErrorAlert(errorMsg);
+      }
+    }
+  }
+
+  void _showSessionExpiredAlert() {
+    if (_hasShownAlert) return;
+    _hasShownAlert = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder:
+            (_) => CustomAlert(
+              title: 'Sesi Habis',
+              message: 'Sesi telah habis, silakan login kembali.',
+              confirmText: 'OK',
+              onConfirm: () async {
+                await TokenManager.removeToken();
+                Navigator.of(context).pop();
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                );
+              },
+            ),
+      );
+    });
+  }
+
+  void _showGeneralErrorAlert(String message) {
+    if (_hasShownAlert) return;
+    _hasShownAlert = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder:
+            (_) => CustomAlert(
+              title: 'Terjadi Kesalahan',
+              message: message,
+              confirmText: 'Tutup',
+              onConfirm: () => Navigator.of(context).pop(),
+            ),
+      );
+    });
   }
 
   String formatPrice(int price) {
@@ -44,7 +114,15 @@ class _MakananScreenState extends State<MakananScreen> {
         if (makananProv.isLoading) {
           return const Center(child: CircularProgressIndicator());
         } else if (makananProv.error != null) {
-          return Center(child: Text('Terjadi kesalahan: ${makananProv.error}'));
+          final errorMsg = makananProv.error!;
+          if ((errorMsg.contains('401') ||
+                  errorMsg.contains('Unauthenticated')) &&
+              !_hasShownAlert) {
+            _showSessionExpiredAlert();
+          } else if (!_hasShownAlert) {
+            _showGeneralErrorAlert(errorMsg);
+          }
+          return const SizedBox();
         } else if (makananProv.makananList.isEmpty) {
           return Center(
             child: Column(
