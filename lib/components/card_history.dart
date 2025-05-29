@@ -32,17 +32,17 @@ class OrderHistoryCard extends StatelessWidget {
   Color _statusColor(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
-        return const Color(0xFFFFC107); // Kuning keemasan (menunggu)
+        return const Color(0xFFFFC107);
       case 'cooking':
-        return const Color(0xFFFF7043); // Oranye terang (sedang dimasak)
+        return const Color(0xFFFF7043);
       case 'on_delivery':
-        return const Color(0xFF42A5F5); // Biru cerah (dalam pengiriman)
-      case 'completed':
-        return const Color(0xFF4CAF50); // Hijau sejuk (selesai)
+        return const Color(0xFF42A5F5);
+      case 'done':
+        return const Color(0xFF4CAF50);
       case 'cancelled':
-        return const Color(0xFFE57373); // Merah lembut (dibatalkan)
+        return const Color(0xFFE57373);
       default:
-        return Colors.grey.shade400; // Status tidak dikenal
+        return Colors.grey.shade400;
     }
   }
 

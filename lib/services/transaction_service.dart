@@ -5,6 +5,7 @@ import 'api_config.dart';
 import '../models/order_model.dart';
 import 'package:flutter/foundation.dart';
 import '../models/shipping_model.dart';
+import '../models/transaction_history_model.dart';
 
 Future<Map<String, dynamic>> createOrder({
   required List<Map<String, dynamic>> menu,
@@ -160,7 +161,7 @@ Future<List<ShippingTransactionModel>> fetchShippingTransactions() async {
 }
 
 Future<Map<String, dynamic>> cancelTransaction(int transactionId) async {
-  final token = await TokenManager.getToken(); 
+  final token = await TokenManager.getToken();
   final url = Uri.parse('${ApiConfig.baseUrl}/transaction-cancel');
 
   final response = await http.post(
@@ -175,9 +176,30 @@ Future<Map<String, dynamic>> cancelTransaction(int transactionId) async {
   if (response.statusCode == 200) {
     return json.decode(response.body);
   } else {
-    return {
-      'status': 'error',
-      'message': 'Gagal membatalkan pesanan',
-    };
+    return {'status': 'error', 'message': 'Gagal membatalkan pesanan'};
+  }
+}
+
+Future<List<TransactionHistoryModel>> fetchTransactionHistory() async {
+  final token = await TokenManager.getToken();
+  final url = Uri.parse('${ApiConfig.baseUrl}/transaction-history');
+
+  final response = await http.get(
+    url,
+    headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
+  );
+
+  if (response.statusCode == 200) {
+    final body = jsonDecode(response.body);
+    if (body['status'] == 'success') {
+      List<dynamic> data = body['data'];
+      return data
+          .map((item) => TransactionHistoryModel.fromJson(item))
+          .toList();
+    } else {
+      throw Exception('Gagal mengambil data riwayat transaksi');
+    }
+  } else {
+    throw Exception('Gagal terhubung ke server (${response.statusCode})');
   }
 }
