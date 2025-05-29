@@ -53,3 +53,31 @@ class CustomAlert extends StatelessWidget {
     );
   }
 }
+
+Future<bool> showConfirmDialog({
+  required BuildContext context,
+  required String title,
+  required String message,
+  String confirmText = 'Ya',
+  String cancelText = 'Batal',
+}) async {
+  bool confirmed = false;
+
+  await showDialog(
+    context: context,
+    builder: (context) => CustomAlert(
+      title: title,
+      message: message,
+      confirmText: confirmText,
+      cancelText: cancelText,
+      onConfirm: () {
+        confirmed = true;
+        Navigator.of(context).pop();
+      },
+      onCancel: () => Navigator.of(context).pop(),
+    ),
+  );
+
+  return confirmed;
+}
+

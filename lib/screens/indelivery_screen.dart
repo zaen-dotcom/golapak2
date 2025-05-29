@@ -42,31 +42,32 @@ class _InDeliveryScreenState extends State<InDeliveryScreen> {
           final sortedShippings = [...shippingProvider.shippings];
           sortedShippings.sort((a, b) => b.date.compareTo(a.date));
 
-          return ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            itemCount: sortedShippings.length,
-            itemBuilder: (context, index) {
-              final shipping = sortedShippings[index];
+         return ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              itemCount: sortedShippings.length,
+              itemBuilder: (context, index) {
+                final shipping = sortedShippings[index];
 
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const DeliveryDetailScreen(),
-                    ),
-                  );
-                },
-                child: OrderHistoryCard(
-                  transactionCode: shipping.transactionCode,
-                  totalQty: shipping.totalQty,
-                  grandTotal: shipping.grandTotal,
-                  date: shipping.date,
-                  status: shipping.status,
-                ),
-              );
-            },
-          );
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DeliveryDetailScreen(orderId: shipping.id.toString()),
+                      ),
+                    );
+                  },
+                  child: OrderHistoryCard(
+                    transactionCode: shipping.transactionCode,
+                    totalQty: shipping.totalQty,
+                    grandTotal: shipping.grandTotal,
+                    date: shipping.date,
+                    status: shipping.status,
+                  ),
+                );
+              },
+            );
+
         },
       ),
     );

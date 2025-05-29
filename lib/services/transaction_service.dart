@@ -107,10 +107,19 @@ Future<Map<String, dynamic>?> calculateTransaction(
 }
 
 List<Order> _parseOrders(String responseBody) {
-  final parsed = json.decode(responseBody)['data'] as List<dynamic>;
-  return parsed.map((json) => Order.fromJson(json)).toList();
-}
+  final parsed = jsonDecode(responseBody);
 
+  if (parsed is List) {
+    return parsed.map<Order>((json) => Order.fromJson(json)).toList();
+  } else if (parsed is Map && parsed.containsKey('data')) {
+    return (parsed['data'] as List)
+        .map<Order>((json) => Order.fromJson(json))
+        .toList();
+  } else {
+    print('Format data tidak dikenali: $parsed');
+    return [];
+  }
+}
 Future<List<Order>?> fetchTransactionProgress() async {
   final url = Uri.parse('${ApiConfig.baseUrl}/transaction-progress');
 
@@ -160,23 +169,59 @@ Future<List<ShippingTransactionModel>> fetchShippingTransactions() async {
   }
 }
 
-Future<Map<String, dynamic>> cancelTransaction(int transactionId) async {
-  final token = await TokenManager.getToken();
-  final url = Uri.parse('${ApiConfig.baseUrl}/transaction-cancel');
 
-  final response = await http.post(
+Future<Map<String, dynamic>> fetchOrderDetailFromApi(String orderId) async {
+  final url = Uri.parse('${ApiConfig.baseUrl}/transaction/$orderId');
+  final token = await TokenManager.getToken();
+
+  final response = await http.get(
     url,
     headers: {
-      'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
+      'Accept': 'application/json',
     },
-    body: json.encode({'id': transactionId}),
   );
 
   if (response.statusCode == 200) {
-    return json.decode(response.body);
+    final body = jsonDecode(response.body);
+    if (body['status'] == 'success') {
+      return body['data']; // ⬅ langsung kembalikan data
+    } else {
+      throw Exception('Gagal mengambil detail pesanan: ${body['message']}');
+    }
   } else {
-    return {'status': 'error', 'message': 'Gagal membatalkan pesanan'};
+    throw Exception('Gagal mengambil detail pesanan. Status: ${response.statusCode}');
+  }
+}
+
+
+Future<Map<String, dynamic>> cancelTransaction(int transactionId) async {
+  try {
+    final token = await TokenManager.getToken();
+    final url = Uri.parse('${ApiConfig.baseUrl}/transaction-cancel');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({'id': transactionId}),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      return {
+        'status': 'error',
+        'message': 'Gagal membatalkan pesanan. Status: ${response.statusCode}',
+      };
+    }
+  } catch (e) {
+    return {
+      'status': 'error',
+      'message': 'Terjadi kesalahan saat membatalkan pesanan: $e',
+    };
   }
 }
 
@@ -203,3 +248,4 @@ Future<List<TransactionHistoryModel>> fetchTransactionHistory() async {
     throw Exception('Gagal terhubung ke server (${response.statusCode})');
   }
 }
+

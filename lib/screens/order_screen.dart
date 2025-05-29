@@ -17,83 +17,43 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      final contextSnapshot = context;
-      Provider.of<OrderProvider>(contextSnapshot, listen: false).loadOrders();
-    });
+
+    Future.microtask(
+      () => Provider.of<OrderProvider>(context, listen: false).loadOrders(),
+    );
   }
 
-  void _navigateToDetail(BuildContext context) {
+  bool _canCancel(String? status) {
+    return status == 'pending' || status == 'processing';
+  }
+
+  void _handleCancelOrder(BuildContext context, int orderId) async {
+    final confirmed = await showConfirmDialog(
+      context: context,
+      title: 'Batalkan Pesanan',
+      message: 'Yakin ingin membatalkan pesanan ini?',
+    );
+
+    if (confirmed) {
+      await Provider.of<OrderProvider>(context, listen: false)
+          .cancelOrder(orderId);
+    }
+  }
+
+  void _navigateToDetail(BuildContext context, String orderId) {
     Navigator.of(context).push(
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 300),
         pageBuilder: (_, animation, __) {
           return FadeTransition(
             opacity: animation,
-            child: const OrderDetailScreen(),
+            child: OrderDetailScreen(orderId: orderId),
           );
         },
       ),
     );
   }
 
-  Future<bool?> _showCancelConfirmation(BuildContext parentContext) {
-    return showDialog<bool>(
-      context: parentContext,
-      barrierDismissible: false,
-      builder:
-          (ctx) => WillPopScope(
-            onWillPop: () async => false,
-            child: CustomAlert(
-              title: 'Batalkan Pesanan',
-              message: 'Yakin ingin membatalkan pesanan ini?',
-              confirmText: 'Ya',
-              cancelText: 'Tidak',
-              onConfirm: () => Navigator.of(ctx).pop(true),
-              onCancel: () => Navigator.of(ctx).pop(false),
-              isDestructive: true,
-            ),
-          ),
-    );
-  }
-
-  Future<void> _handleCancelOrder(
-    BuildContext validContext,
-    int orderId,
-  ) async {
-    final confirmed = await _showCancelConfirmation(validContext);
-
-    if (confirmed != true) return;
-
-    final response = await Provider.of<OrderProvider>(
-      validContext,
-      listen: false,
-    ).cancelOrder(orderId);
-
-    if (!mounted) return;
-
-    if (response['status'] != 'success') {
-      await showDialog(
-        context: validContext,
-        barrierDismissible: false,
-        builder:
-            (ctx) => WillPopScope(
-              onWillPop: () async => false,
-              child: CustomAlert(
-                title: 'Gagal',
-                message:
-                    'Gagal membatalkan pesanan: ${response['message'] ?? 'Unknown error'}',
-                confirmText: 'OK',
-                onConfirm: () => Navigator.of(ctx).pop(),
-              ),
-            ),
-      );
-    }
-  }
-
-  bool _canCancel(String status) {
-    return status.toLowerCase() == 'pending';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +87,7 @@ class _OrderScreenState extends State<OrderScreen> {
                   children: [
                     InkWell(
                       borderRadius: BorderRadius.circular(12),
-                      onTap: () => _navigateToDetail(context),
+                      onTap: () => _navigateToDetail(context, order.id.toString()),
                       child: OrderHistoryCard(
                         transactionCode: order.transactionCode,
                         totalQty: order.totalQty,

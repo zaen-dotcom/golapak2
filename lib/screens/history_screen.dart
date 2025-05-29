@@ -21,7 +21,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+    Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: Consumer<TransactionHistoryProvider>(
@@ -50,7 +50,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const DetailHistoryScreen(), 
+                     builder: (_) => DetailHistoryScreen(orderId: trx.id.toString()),
                     ),
                   );
                 },
