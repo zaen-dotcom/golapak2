@@ -48,10 +48,9 @@ class OrderDetail {
   }
 
 
-  static Future<OrderDetail> fetchOrderDetail(String orderId) async {
-    // Panggil API dengan orderId, misal di transaction_service.dart
-    final responseJson = await fetchOrderDetailFromApi(orderId);
-    // Pastikan responseJson sudah berupa Map<String, dynamic>
-    return OrderDetail.fromJson(responseJson['data']);
-  }
+ static Future<OrderDetail> fetchOrderDetail(String orderId) async {
+  final data = await fetchOrderDetailFromApi(orderId);
+  return OrderDetail.fromJson(data); // ⬅ tidak pakai ['data'] lagi
+}
+
 }

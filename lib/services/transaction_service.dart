@@ -185,7 +185,7 @@ Future<Map<String, dynamic>> fetchOrderDetailFromApi(String orderId) async {
   if (response.statusCode == 200) {
     final body = jsonDecode(response.body);
     if (body['status'] == 'success') {
-      return body['data'];
+      return body['data']; // ⬅ langsung kembalikan data
     } else {
       throw Exception('Gagal mengambil detail pesanan: ${body['message']}');
     }
@@ -193,6 +193,7 @@ Future<Map<String, dynamic>> fetchOrderDetailFromApi(String orderId) async {
     throw Exception('Gagal mengambil detail pesanan. Status: ${response.statusCode}');
   }
 }
+
 
 Future<Map<String, dynamic>> cancelTransaction(int transactionId) async {
   try {
