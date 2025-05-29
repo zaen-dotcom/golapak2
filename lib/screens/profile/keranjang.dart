@@ -197,6 +197,22 @@ class _CartScreenState extends State<CartScreen> {
               child: CustomButton(
                 text: 'BUAT PESANAN',
                 onPressed: () async {
+                  final now = DateTime.now();
+                  final bukaJam = 9;
+                  final tutupJam = 21;
+
+                  if (now.hour < bukaJam || now.hour >= tutupJam) {
+                    await showCustomAlertDialog(
+                      context: context,
+                      title: 'Tutup',
+                      message:
+                          'Pesanan hanya bisa dibuat antara jam 09:00 pagi hingga 21:00 malam.',
+                      confirmText: 'OK',
+                      onConfirm: () {},
+                    );
+                    return;
+                  }
+
                   if (cartItems.isEmpty) {
                     await showCustomAlertDialog(
                       context: context,

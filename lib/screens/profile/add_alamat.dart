@@ -7,6 +7,8 @@ import '../../components/alertdialog.dart';
 import '../../services/user_service.dart';
 import 'package:provider/provider.dart';
 import '../../providers/user_provider.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/foundation.dart';
 
 class AddAlamatScreen extends StatefulWidget {
   const AddAlamatScreen({Key? key}) : super(key: key);
@@ -268,9 +270,15 @@ class _AddAlamatScreenState extends State<AddAlamatScreen> {
                           ),
                           myLocationEnabled: true,
                           myLocationButtonEnabled: true,
-                          onCameraMove:
-                              _onCameraMove, // <-- ini yang bikin map geser & update lokasi
+                          onCameraMove: _onCameraMove,
+                          gestureRecognizers:
+                              <Factory<OneSequenceGestureRecognizer>>{
+                                Factory<OneSequenceGestureRecognizer>(
+                                  () => EagerGestureRecognizer(),
+                                ),
+                              },
                         ),
+
                         const Icon(
                           Icons.location_pin,
                           size: 36,
