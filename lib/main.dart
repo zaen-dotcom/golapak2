@@ -15,6 +15,7 @@ import 'screens/splash_screen.dart';
 import 'providers/product_provider.dart';
 import 'package:golapak2/providers/order_provider.dart';
 import 'providers/shipping_provider.dart';
+import 'providers/transaction_history_provider.dart';
 import 'theme/theme.dart';
 
 void main() {
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => MinumanProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProvider(create: (_) => ShippingProvider()),
+        ChangeNotifierProvider(create: (_) => TransactionHistoryProvider()),
       ],
       child: MaterialApp(
         title: 'My App',

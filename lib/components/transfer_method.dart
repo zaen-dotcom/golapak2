@@ -33,7 +33,6 @@ class _ChooseTransferMethodPageState extends State<ChooseTransferMethodPage> {
       case 'DANA':
         return FontAwesomeIcons.wallet;
       case 'BRI':
-        return FontAwesomeIcons.buildingColumns;
       case 'BCA':
         return FontAwesomeIcons.buildingColumns;
       default:
@@ -44,31 +43,71 @@ class _ChooseTransferMethodPageState extends State<ChooseTransferMethodPage> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children:
-          transferMethods.map((method) {
-            final name = method['name']!;
-            return ListTile(
-              leading: Radio<String>(
-                value: name,
-                groupValue: selectedBank,
-                onChanged: (val) {
-                  setState(() {
-                    selectedBank = val;
-                  });
-                  if (widget.onChanged != null) {
-                    widget.onChanged!(val);
-                  }
-                },
-              ),
-              title: Row(
-                children: [
-                  FaIcon(_getBankIcon(name), size: 20, color: Colors.blue[800]),
-                  const SizedBox(width: 8),
-                  Text(name),
-                ],
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Pilih Metode Pembayaran',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 12),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: transferMethods.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 3.5,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+          ),
+          itemBuilder: (context, index) {
+            final name = transferMethods[index]['name']!;
+            final isSelected = selectedBank == name;
+
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedBank = name;
+                });
+                if (widget.onChanged != null) {
+                  widget.onChanged!(name);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: isSelected ? Colors.blue : Colors.grey.shade300,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  color: isSelected ? Colors.blue.shade50 : Colors.white,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    FaIcon(
+                      _getBankIcon(name),
+                      color: isSelected ? Colors.blue : Colors.grey,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      name,
+                      style: TextStyle(
+                        color:
+                            isSelected ? Colors.blue.shade900 : Colors.black87,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
-          }).toList(),
+          },
+        ),
+      ],
     );
   }
 }

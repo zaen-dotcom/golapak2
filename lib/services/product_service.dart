@@ -25,13 +25,21 @@ Future<List<ProductModel>> _fetchProduk(String endpoint) async {
       Uri.parse(url),
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json', // penting!
         'Authorization': 'Bearer $token',
       },
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body)['data'];
+      if (response.body.startsWith('<!DOCTYPE html>')) {
+        throw Exception('401'); // respons HTML, berarti token salah
+      }
+
+      final decoded = json.decode(response.body);
+      final List<dynamic> data = decoded['data'];
       return data.map((item) => ProductModel.fromJson(item)).toList();
+    } else if (response.statusCode == 401) {
+      throw Exception('401');
     } else {
       throw Exception('Gagal mengambil data produk: ${response.statusCode}');
     }

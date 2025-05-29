@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../theme/colors.dart';
 
 class OrderHistoryCard extends StatelessWidget {
   final String transactionCode;
@@ -7,6 +6,7 @@ class OrderHistoryCard extends StatelessWidget {
   final int grandTotal;
   final String date;
   final String status;
+  final Widget? cancelButton;
 
   const OrderHistoryCard({
     super.key,
@@ -15,6 +15,7 @@ class OrderHistoryCard extends StatelessWidget {
     required this.grandTotal,
     required this.date,
     required this.status,
+    this.cancelButton,
   });
 
   String _formatCurrency(int amount) {
@@ -31,13 +32,15 @@ class OrderHistoryCard extends StatelessWidget {
   Color _statusColor(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
-        return AppColors.primary;
-      case 'completed':
-        return Colors.green;
+        return const Color(0xFFFFC107);
+      case 'cooking':
+        return const Color(0xFFFF7043);
+      case 'on_delivery':
+        return const Color(0xFF42A5F5);
+      case 'done':
+        return const Color(0xFF4CAF50);
       case 'cancelled':
-        return Colors.red.shade400;
-      case 'on_delivery': 
-        return Colors.blue;
+        return const Color(0xFFE57373);
       default:
         return Colors.grey.shade400;
     }
@@ -76,7 +79,6 @@ class OrderHistoryCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          // Detail row: Quantity & Date
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -124,9 +126,9 @@ class OrderHistoryCard extends StatelessWidget {
                     color: Colors.grey,
                   ),
                   const SizedBox(width: 6),
-                  Text(
+                  const Text(
                     'Total:',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Colors.black54,
@@ -163,6 +165,12 @@ class OrderHistoryCard extends StatelessWidget {
               ),
             ),
           ),
+
+          // Cancel button area
+          if (cancelButton != null) ...[
+            const SizedBox(height: 16),
+            Align(alignment: Alignment.centerRight, child: cancelButton!),
+          ],
         ],
       ),
     );
