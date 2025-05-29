@@ -35,11 +35,11 @@ class OrderHistoryCard extends StatelessWidget {
         return const Color(0xFFFFC107);
       case 'cooking':
         return const Color(0xFFFF7043);
-      case 'on_delivery':
+      case 'on delivery':
         return const Color(0xFF42A5F5);
       case 'done':
         return const Color(0xFF4CAF50);
-      case 'cancelled':
+      case 'canceled':
         return const Color(0xFFE57373);
       default:
         return Colors.grey.shade400;

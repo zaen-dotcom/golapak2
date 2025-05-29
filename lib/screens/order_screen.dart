@@ -35,8 +35,10 @@ class _OrderScreenState extends State<OrderScreen> {
     );
 
     if (confirmed) {
-      await Provider.of<OrderProvider>(context, listen: false)
-          .cancelOrder(orderId);
+      await Provider.of<OrderProvider>(
+        context,
+        listen: false,
+      ).cancelOrder(orderId);
     }
   }
 
@@ -53,7 +55,6 @@ class _OrderScreenState extends State<OrderScreen> {
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -78,55 +79,49 @@ class _OrderScreenState extends State<OrderScreen> {
             itemBuilder: (context, index) {
               final order = sortedOrders[index];
 
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Stack(
-                  children: [
-                    InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () => _navigateToDetail(context, order.id.toString()),
-                      child: OrderHistoryCard(
-                        transactionCode: order.transactionCode,
-                        totalQty: order.totalQty,
-                        grandTotal: order.grandTotal,
-                        date: DateFormat(
-                          'yyyy-MM-dd HH:mm:ss',
-                        ).format(order.date),
-                        status: order.status,
-                        cancelButton: null,
-                      ),
+              return Stack(
+                children: [
+                  InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap:
+                        () => _navigateToDetail(context, order.id.toString()),
+                    child: OrderHistoryCard(
+                      transactionCode: order.transactionCode,
+                      totalQty: order.totalQty,
+                      grandTotal: order.grandTotal,
+                      date: DateFormat(
+                        'yyyy-MM-dd HH:mm:ss',
+                      ).format(order.date),
+                      status: order.status,
+                      cancelButton: null,
                     ),
-                    if (_canCancel(order.status))
-                      Positioned(
-                        right: 24,
-                        bottom: 23,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            minimumSize: const Size(0, 40),
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            visualDensity: VisualDensity.compact,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                  ),
+                  if (_canCancel(order.status))
+                    Positioned(
+                      right: 25,
+                      bottom: 22,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
                           ),
-                          onPressed:
-                              () => _handleCancelOrder(context, order.id),
-                          child: const Text(
-                            'Batalkan',
-                            style: TextStyle(fontSize: 14),
+                          minimumSize: const Size(0, 40),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
+                        onPressed: () => _handleCancelOrder(context, order.id),
+                        child: const Text(
+                          'Batalkan',
+                          style: TextStyle(fontSize: 14),
+                        ),
                       ),
-                  ],
-                ),
+                    ),
+                ],
               );
             },
           );

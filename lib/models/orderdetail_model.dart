@@ -3,7 +3,6 @@ import 'shipping_address.dart';
 import '../services/transaction_service.dart';
 
 class OrderDetail {
-  
   final int id;
   final String transactionCode;
   final int totalQty;
@@ -43,14 +42,12 @@ class OrderDetail {
       date: DateTime.parse(transaction['date']),
       status: transaction['status'],
       items: details.map((item) => OrderItem.fromJson(item)).toList(),
-      shipping: ShippingAddress.fromJson(shippingList.first), // ambil data pertama saja
+      shipping: ShippingAddress.fromJson(shippingList.first),
     );
   }
 
-
- static Future<OrderDetail> fetchOrderDetail(String orderId) async {
-  final data = await fetchOrderDetailFromApi(orderId);
-  return OrderDetail.fromJson(data); // ⬅ tidak pakai ['data'] lagi
-}
-
+  static Future<OrderDetail> fetchOrderDetail(String orderId) async {
+    final data = await fetchOrderDetailFromApi(orderId);
+    return OrderDetail.fromJson(data);
+  }
 }
