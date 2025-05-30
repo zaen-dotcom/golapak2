@@ -15,11 +15,11 @@ class OrderItem {
 
   factory OrderItem.fromJson(Map<String, dynamic> json) {
     return OrderItem(
-      id: json['id'],
-      name: json['name'],
-      qty: json['qty'],
-      mainCost: json['main_cost'],
-      mainSubtotal: json['main_subtotal'],
+      id: int.tryParse(json['id'].toString()) ?? 0,
+      name: json['name'] ?? '',
+      qty: int.tryParse(json['qty'].toString()) ?? 0,
+      mainCost: int.tryParse(json['main_cost'].toString()) ?? 0,
+      mainSubtotal: int.tryParse(json['main_subtotal'].toString()) ?? 0,
     );
   }
 }

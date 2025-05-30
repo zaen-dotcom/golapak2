@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/address_provider.dart';
+import '../providers/user_provider.dart'; 
 import '../components/address_list.dart';
 
 class SelectAddressScreen extends StatefulWidget {
@@ -15,7 +16,12 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      Provider.of<AlamatProvider>(context, listen: false).fetchAlamat(1);
+      final userId = Provider.of<UserProvider>(context, listen: false).userId;
+      if (userId != null) {
+        Provider.of<AlamatProvider>(context, listen: false).fetchAlamat(userId);
+      } else {
+        print("User ID belum tersedia!");
+      }
     });
   }
 
@@ -44,8 +50,10 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
       ),
       body: AlamatList(
         onSelect: (selectedAlamat) {
-          Provider.of<AlamatProvider>(context, listen: false)
-              .setSelectedAlamat(selectedAlamat);
+          Provider.of<AlamatProvider>(
+            context,
+            listen: false,
+          ).setSelectedAlamat(selectedAlamat);
           Navigator.pop(context);
         },
       ),

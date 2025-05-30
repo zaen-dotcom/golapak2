@@ -16,13 +16,13 @@ class Order {
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
-  return Order(
-    id: json['id'],
-    transactionCode: json['transaction_code'],
-    totalQty: json['total_qty'],
-    grandTotal: json['grand_total'],
-    date: DateTime.parse(json['date']),
-    status: json['status'],
-  );
-}
+    return Order(
+      id: json['id'],
+      transactionCode: json['transaction_code'],
+      totalQty: int.tryParse(json['total_qty'].toString()) ?? 0,
+      grandTotal: int.tryParse(json['grand_total'].toString()) ?? 0,
+      date: DateTime.parse(json['date']),
+      status: json['status'],
+    );
   }
+}

@@ -110,7 +110,7 @@ class _AlamatScreenState extends State<AlamatScreen> {
                       address: item['address'] ?? 'Alamat tidak tersedia',
                       name: item['name'] ?? 'Nama tidak tersedia',
                       phone: item['phone_number'] ?? 'Nomor tidak tersedia',
-                      isMain: item['main_address'] == 1,
+                      isMain: item['main_address'].toString() == '1',
                       onEdit: () {
                         Navigator.push(
                           context,

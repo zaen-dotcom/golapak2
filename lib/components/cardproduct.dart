@@ -21,9 +21,6 @@ class CardProduct extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String truncatedTitle =
-        title.length > 20 ? '${title.substring(0, 20)}…' : title;
-
     return Container(
       margin: const EdgeInsets.all(8),
       padding: const EdgeInsets.all(12),
@@ -89,7 +86,9 @@ class CardProduct extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                truncatedTitle,
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 15,

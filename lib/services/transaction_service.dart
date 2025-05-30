@@ -6,6 +6,7 @@ import '../models/order_model.dart';
 import 'package:flutter/foundation.dart';
 import '../models/shipping_model.dart';
 import '../models/transaction_history_model.dart';
+import '../models/calculate_model.dart';
 
 Future<Map<String, dynamic>> createOrder({
   required List<Map<String, dynamic>> menu,
@@ -62,7 +63,7 @@ Future<Map<String, dynamic>> createOrder({
   }
 }
 
-Future<Map<String, dynamic>?> calculateTransaction(
+Future<TransactionSummary?> calculateTransaction(
   List<Map<String, dynamic>> menuList,
 ) async {
   final token = await TokenManager.getToken();
@@ -77,6 +78,14 @@ Future<Map<String, dynamic>?> calculateTransaction(
   final body = {'menu': menuList};
   final encodedBody = jsonEncode(body);
 
+  print('--- REQUEST TRANSACTION CALCULATE ---');
+  print('URL: $url');
+  print(
+    'Headers: {Accept: application/json, Authorization: Bearer $token, Content-Type: application/json}',
+  );
+  print('Body: $encodedBody');
+  print('------------------------------------');
+
   try {
     final response = await http.post(
       url,
@@ -88,10 +97,15 @@ Future<Map<String, dynamic>?> calculateTransaction(
       body: encodedBody,
     );
 
+    print('--- RESPONSE TRANSACTION CALCULATE ---');
+    print('Status Code: ${response.statusCode}');
+    print('Body: ${response.body}');
+    print('-------------------------------------');
+
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (data['status'] == 'success') {
-        return data['data'];
+        return TransactionSummary.fromJson(data['data']);
       } else {
         print('Error dari server: ${data['message']}');
         return null;
@@ -120,6 +134,7 @@ List<Order> _parseOrders(String responseBody) {
     return [];
   }
 }
+
 Future<List<Order>?> fetchTransactionProgress() async {
   final url = Uri.parse('${ApiConfig.baseUrl}/transaction-progress');
 
@@ -169,31 +184,28 @@ Future<List<ShippingTransactionModel>> fetchShippingTransactions() async {
   }
 }
 
-
 Future<Map<String, dynamic>> fetchOrderDetailFromApi(String orderId) async {
   final url = Uri.parse('${ApiConfig.baseUrl}/transaction/$orderId');
   final token = await TokenManager.getToken();
 
   final response = await http.get(
     url,
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Accept': 'application/json',
-    },
+    headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
   );
 
   if (response.statusCode == 200) {
     final body = jsonDecode(response.body);
     if (body['status'] == 'success') {
-      return body['data']; // ⬅ langsung kembalikan data
+      return body['data'];
     } else {
       throw Exception('Gagal mengambil detail pesanan: ${body['message']}');
     }
   } else {
-    throw Exception('Gagal mengambil detail pesanan. Status: ${response.statusCode}');
+    throw Exception(
+      'Gagal mengambil detail pesanan. Status: ${response.statusCode}',
+    );
   }
 }
-
 
 Future<Map<String, dynamic>> cancelTransaction(int transactionId) async {
   try {
@@ -248,4 +260,3 @@ Future<List<TransactionHistoryModel>> fetchTransactionHistory() async {
     throw Exception('Gagal terhubung ke server (${response.statusCode})');
   }
 }
-

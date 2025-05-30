@@ -3,10 +3,6 @@ import '../models/order_model.dart';
 import '../services/transaction_service.dart';
 
 
-
-
-
-
 class OrderProvider with ChangeNotifier {
   List<Order> _orders = [];
   bool _isLoading = false;
@@ -38,7 +34,7 @@ class OrderProvider with ChangeNotifier {
     }
   } catch (e, stack) {
     print('Gagal load orders: $e');
-    print(stack); // Ini buat log lengkap
+    print(stack); 
     _orders = [];
   }
 

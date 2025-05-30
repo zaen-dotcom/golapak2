@@ -53,7 +53,6 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
     }
   }
 
-  // Fungsi untuk mengubah underscore menjadi spasi pada status
   String formatStatus(String status) {
     return status.replaceAll('_', ' ');
   }

@@ -22,8 +22,8 @@ class ProductModel {
       name: json['name'] ?? '',
       image:
           json['image'] != null && json['image'] != ''
-              ? 'http://192.168.33.228:8000/storage/${json['image']}'
-              : 'http://192.168.33.228:8000/storage/default-image.png',
+              ? 'http://go-lapak.nekolympus.my.id/storage/${json['image']}'
+              : 'http://go-lapak.nekolympus.my.id/storage/default-image.png',
       mainCost:
           json['main_cost'] != null
               ? (json['main_cost'] is num

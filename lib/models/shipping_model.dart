@@ -17,12 +17,12 @@ class ShippingTransactionModel {
 
   factory ShippingTransactionModel.fromJson(Map<String, dynamic> json) {
     return ShippingTransactionModel(
-      id: json['id'],
-      transactionCode: json['transaction_code'],
-      totalQty: json['total_qty'],
-      grandTotal: json['grand_total'],
-      date: json['date'],
-      status: json['status'],
+      id: int.tryParse(json['id'].toString()) ?? 0,
+      transactionCode: json['transaction_code'] ?? '',
+      totalQty: int.tryParse(json['total_qty'].toString()) ?? 0,
+      grandTotal: int.tryParse(json['grand_total'].toString()) ?? 0,
+      date: json['date'] ?? '',
+      status: json['status'] ?? '',
     );
   }
 }

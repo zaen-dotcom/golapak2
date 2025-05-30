@@ -44,11 +44,17 @@ class AddressModel {
 
   factory AddressModel.fromJson(Map<String, dynamic> json) {
     return AddressModel(
-      id: json['id'],
-      userId: json['user_id'],
-      name: json['name'],
-      phoneNumber: json['phone_number'],
-      address: json['address'],
+      id:
+          json['id'] is int
+              ? json['id']
+              : int.tryParse(json['id'].toString()) ?? 0,
+      userId:
+          json['user_id'] is int
+              ? json['user_id']
+              : int.tryParse(json['user_id'].toString()) ?? 0,
+      name: json['name'] ?? '',
+      phoneNumber: json['phone_number'] ?? '',
+      address: json['address'] ?? '',
       latitude:
           (json['latitude'] is double)
               ? json['latitude']
@@ -57,7 +63,10 @@ class AddressModel {
           (json['longitude'] is double)
               ? json['longitude']
               : double.tryParse(json['longitude'].toString()) ?? 0.0,
-      isMainAddress: json['main_address'] == true || json['main_address'] == 1,
+      isMainAddress:
+          (json['main_address'] == '1' ||
+              json['main_address'] == 1 ||
+              json['main_address'] == true),
     );
   }
 
@@ -70,7 +79,7 @@ class AddressModel {
       'address': address,
       'latitude': latitude,
       'longitude': longitude,
-      'main_address': isMainAddress,
+      'main_address': isMainAddress ? 1 : 0,
     };
   }
 }

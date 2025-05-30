@@ -14,7 +14,6 @@ class AlamatProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-
     try {
       final addresses = await getAddress(userId);
 
@@ -22,7 +21,7 @@ class AlamatProvider with ChangeNotifier {
       List<Map<String, dynamic>> otherAddresses = [];
 
       for (var address in addresses) {
-        if (address['main_address'] == 1) {
+        if (address['main_address'] == '1') {
           mainAddress.add(address);
         } else {
           otherAddresses.add(address);

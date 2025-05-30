@@ -24,7 +24,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   String? selectedBank;
 
   int totalHargaProduk = 0;
-  int biayaOngkir = 0;
+  String biayaOngkir = '0';
   int totalBiayaPembayaran = 0;
   bool isLoadingSummary = false;
   late CartProvider _cartProvider;
@@ -59,7 +59,21 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     super.dispose();
   }
 
-  Widget _buildSummaryRow(String label, int amount, {bool bold = false}) {
+  String formatCurrencyString(String numberStr) {
+    final intValue = int.tryParse(numberStr) ?? 0;
+    return 'Rp ${formatRibuan(intValue)}';
+  }
+
+  Widget _buildSummaryRow(String label, dynamic amount, {bool bold = false}) {
+    String displayValue;
+    if (amount is int) {
+      displayValue = 'Rp ${formatRibuan(amount)}';
+    } else if (amount is String) {
+      displayValue = formatCurrencyString(amount);
+    } else {
+      displayValue = amount.toString();
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -67,7 +81,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
         children: [
           Text(label),
           Text(
-            'Rp ${formatRibuan(amount)}',
+            displayValue,
             style: TextStyle(
               fontWeight: bold ? FontWeight.bold : FontWeight.normal,
             ),
@@ -78,23 +92,26 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   }
 
   Future<void> _loadRingkasanPembayaran() async {
-    final cartItems = Provider.of<CartProvider>(context, listen: false).items;
+    if (!mounted) return;
 
-    // Jika kosong, arahkan ke halaman utama
+    final cartItems = _cartProvider.items;
+
     if (cartItems.isEmpty) {
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 400),
-            pageBuilder: (_, __, ___) => const MainNavigation(),
-            transitionsBuilder: (_, animation, __, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-          ),
-        );
-      }
+      if (!mounted) return;
+
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 400),
+          pageBuilder: (_, __, ___) => const MainNavigation(),
+          transitionsBuilder: (_, animation, __, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
+      );
       return;
     }
+
+    if (!mounted) return;
 
     setState(() => isLoadingSummary = true);
 
@@ -105,13 +122,19 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
 
     final result = await calculateTransaction(menuList);
 
-    if (mounted && result != null) {
+    if (!mounted) return;
+
+    if (result != null) {
       setState(() {
-        totalHargaProduk = result['total_harga_produk'] ?? 0;
-        biayaOngkir = result['biaya_ongkir'] ?? 0;
-        totalBiayaPembayaran = result['total_biaya_pembayaran'] ?? 0;
+        totalHargaProduk = result.totalHargaProduk;
+        biayaOngkir = result.biayaOngkir;
+        totalBiayaPembayaran = result.totalBiayaPembayaran;
         isLoadingSummary = false;
       });
+    } else {
+      if (mounted) {
+        setState(() => isLoadingSummary = false);
+      }
     }
   }
 
