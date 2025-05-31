@@ -193,3 +193,32 @@ Future<void> deleteAddress(int addressId) async {
     throw Exception('Terjadi kesalahan saat menghapus alamat: $e');
   }
 }
+
+Future<Map<String, dynamic>> fetchStatusToko() async {
+  final url = Uri.parse('${ApiConfig.baseUrl}/status-toko');
+  final token = await TokenManager.getToken();
+
+  try {
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final jsonBody = json.decode(response.body);
+
+      final isOpenString = jsonBody['is_open']?.toString() ?? "0";
+      final isOpen = isOpenString == "1";
+
+      return {
+        'isOpen': isOpen,
+        'status': jsonBody['status'] ?? 'Status tidak diketahui',
+      };
+    } else {
+      throw Exception('Gagal memuat status toko (${response.statusCode})');
+    }
+  } catch (e) {
+    print('❌ [fetchStatusToko] Error: $e');
+    throw Exception('Terjadi kesalahan saat mengambil status toko: $e');
+  }
+}

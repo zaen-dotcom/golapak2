@@ -19,6 +19,8 @@ class CreateOrderScreen extends StatefulWidget {
   _CreateOrderScreenState createState() => _CreateOrderScreenState();
 }
 
+bool isLoading = false;
+
 class _CreateOrderScreenState extends State<CreateOrderScreen> {
   String? _paymentMethod = 'COD';
   String? selectedBank;
@@ -361,94 +363,116 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 50),
         child: CustomButton(
           text: 'KONFIRMASI PESANAN',
-          onPressed: () async {
-            final cartItems = _cartProvider.items.values.toList();
-            final menuList =
-                cartItems
-                    .map((item) => {'id': item.id, 'qty': item.quantity})
-                    .toList();
+          onPressed:
+              isLoading
+                  ? null
+                  : () async {
+                    setState(() => isLoading = true);
 
-            final alamatProvider = Provider.of<AlamatProvider>(
-              context,
-              listen: false,
-            );
-            final alamat = alamatProvider.selectedAlamat;
+                    final cartItems = _cartProvider.items.values.toList();
+                    final menuList =
+                        cartItems
+                            .map(
+                              (item) => {'id': item.id, 'qty': item.quantity},
+                            )
+                            .toList();
 
-            if (alamat == null) {
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder:
-                    (_) => CustomAlert(
-                      title: 'Gagal',
-                      message: 'Alamat belum dipilih.',
-                      confirmText: 'OK',
-                      onConfirm: () => Navigator.of(context).pop(),
-                    ),
-              );
-              return;
-            }
+                    final alamatProvider = Provider.of<AlamatProvider>(
+                      context,
+                      listen: false,
+                    );
+                    final alamat = alamatProvider.selectedAlamat;
 
-            String? accountNumber;
+                    if (alamat == null) {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder:
+                            (_) => CustomAlert(
+                              title: 'Gagal',
+                              message: 'Alamat belum dipilih.',
+                              confirmText: 'OK',
+                              onConfirm: () {
+                                Navigator.of(context).pop();
+                                setState(
+                                  () => isLoading = false,
+                                ); 
+                              },
+                            ),
+                      );
+                      return;
+                    }
 
-            if (_paymentMethod == 'Transfer' && selectedBank != null) {
-              final bankData = transferMethods.firstWhere(
-                (element) => element['name'] == selectedBank,
-                orElse: () => {},
-              );
-              accountNumber = bankData['rekening'];
-            }
+                    String? accountNumber;
+                    if (_paymentMethod == 'Transfer' && selectedBank != null) {
+                      final bankData = transferMethods.firstWhere(
+                        (element) => element['name'] == selectedBank,
+                        orElse: () => {},
+                      );
+                      accountNumber = bankData['rekening'];
+                    }
 
-            final paymentMethodToSend =
-                _paymentMethod == 'Transfer'
-                    ? 'transfer'
-                    : _paymentMethod!.toLowerCase();
+                    final paymentMethodToSend =
+                        _paymentMethod == 'Transfer'
+                            ? 'transfer'
+                            : _paymentMethod!.toLowerCase();
 
-            final response = await createOrder(
-              menu: menuList,
-              addressId: alamat['id'],
-              paymentMethod: paymentMethodToSend,
-              accountNumber: accountNumber,
-            );
+                    final response = await createOrder(
+                      menu: menuList,
+                      addressId: alamat['id'],
+                      paymentMethod: paymentMethodToSend,
+                      accountNumber: accountNumber,
+                    );
 
-            if (response['status'] == 'success') {
-              if (!mounted) return;
+                    if (!mounted) return;
 
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder:
-                    (_) => CustomAlert(
-                      title: 'Berhasil',
-                      message: 'Pesanan berhasil dibuat!',
-                      confirmText: 'Lihat Pesanan',
-                      onConfirm: () {
-                        _cartProvider.clearCart();
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder:
-                                (_) => const MainNavigation(initialIndex: 1),
-                          ),
-                        );
-                      },
-                    ),
-              );
-            } else {
-              if (!mounted) return;
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder:
-                    (_) => CustomAlert(
-                      title: 'Gagal',
-                      message: response['message'] ?? 'Pesanan gagal dibuat.',
-                      confirmText: 'Tutup',
-                      onConfirm: () => Navigator.of(context).pop(),
-                    ),
-              );
-            }
-          },
+                    if (response['status'] == 'success') {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder:
+                            (_) => CustomAlert(
+                              title: 'Berhasil',
+                              message: 'Pesanan berhasil dibuat!',
+                              confirmText: 'Lihat Pesanan',
+                              onConfirm: () {
+                                _cartProvider.clearCart();
+                                Navigator.of(context).pop();
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) => const MainNavigation(
+                                          initialIndex: 1,
+                                        ),
+                                  ),
+                                );
+                                setState(
+                                  () => isLoading = false,
+                                ); 
+                              },
+                            ),
+                      );
+                    } else {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder:
+                            (_) => CustomAlert(
+                              title: 'Gagal',
+                              message:
+                                  response['message'] ??
+                                  'Pesanan gagal dibuat.',
+                              confirmText: 'Tutup',
+                              onConfirm: () {
+                                Navigator.of(context).pop();
+                                setState(
+                                  () => isLoading = false,
+                                ); 
+                              },
+                            ),
+                      );
+                    }
+                  },
 
           isLoading: false,
         ),

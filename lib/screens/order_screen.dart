@@ -17,29 +17,36 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   void initState() {
     super.initState();
-
-    Future.microtask(
-      () => Provider.of<OrderProvider>(context, listen: false).loadOrders(),
-    );
+    Future.microtask(() {
+      Provider.of<OrderProvider>(context, listen: false).loadOrders();
+    });
   }
 
   bool _canCancel(String? status) {
     return status == 'pending' || status == 'processing';
   }
 
-  void _handleCancelOrder(BuildContext context, int orderId) async {
-    final confirmed = await showConfirmDialog(
+  void _handleCancelOrder(BuildContext context, int orderId) {
+    showDialog(
       context: context,
-      title: 'Batalkan Pesanan',
-      message: 'Yakin ingin membatalkan pesanan ini?',
+      barrierDismissible: false,
+      builder: (context) {
+        return CustomAlert(
+          title: 'Batalkan Pesanan',
+          message: 'Yakin ingin membatalkan pesanan ini?',
+          confirmText: 'Ya',
+          cancelText: 'Batal',
+          onConfirm: () async {
+            Navigator.of(context).pop();
+            await Provider.of<OrderProvider>(
+              context,
+              listen: false,
+            ).cancelOrder(orderId);
+          },
+          onCancel: () => Navigator.of(context).pop(),
+        );
+      },
     );
-
-    if (confirmed) {
-      await Provider.of<OrderProvider>(
-        context,
-        listen: false,
-      ).cancelOrder(orderId);
-    }
   }
 
   void _navigateToDetail(BuildContext context, String orderId) {

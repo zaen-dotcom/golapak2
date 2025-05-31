@@ -120,43 +120,48 @@ class _AIScreenState extends State<AIScreen> with TickerProviderStateMixin {
         foregroundColor: Colors.black,
         elevation: 0,
       ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: AnimatedBuilder(
-              animation: _waveAnimation,
-              builder: (context, child) {
-                return CustomPaint(
-                  painter: WaveBackgroundPainter(_waveAnimation.value),
-                );
-              },
-            ),
-          ),
-          Column(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 1),
+          child: Stack(
             children: [
-              Expanded(
-                child: NotificationListener<ScrollNotification>(
-                  onNotification: (notification) {
-                    return false;
+              Positioned.fill(
+                child: AnimatedBuilder(
+                  animation: _waveAnimation,
+                  builder: (context, child) {
+                    return CustomPaint(
+                      painter: WaveBackgroundPainter(_waveAnimation.value),
+                    );
                   },
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _messages.length,
-                    itemBuilder:
-                        (context, index) => _buildMessage(_messages[index]),
-                  ),
                 ),
               ),
-              if (_isLoading)
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: CircularProgressIndicator(),
-                ),
-              _buildInputField(),
+              Column(
+                children: [
+                  Expanded(
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: (notification) {
+                        return false;
+                      },
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.all(16),
+                        itemCount: _messages.length,
+                        itemBuilder:
+                            (context, index) => _buildMessage(_messages[index]),
+                      ),
+                    ),
+                  ),
+                  if (_isLoading)
+                    const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: CircularProgressIndicator(),
+                    ),
+                  _buildInputField(),
+                ],
+              ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -226,7 +231,7 @@ class _AIScreenState extends State<AIScreen> with TickerProviderStateMixin {
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.2),
@@ -236,6 +241,7 @@ class _AIScreenState extends State<AIScreen> with TickerProviderStateMixin {
                   ),
                 ],
               ),
+
               child: TextField(
                 controller: _textController,
                 decoration: InputDecoration(

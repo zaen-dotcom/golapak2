@@ -1,3 +1,5 @@
+import '../services/api_config.dart';
+
 class ProductModel {
   final int id;
   final String name;
@@ -12,24 +14,22 @@ class ProductModel {
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
+    String rawImage = json['image'] ?? '';
+    String imageUrl =
+        rawImage.isNotEmpty
+            ? '${ApiConfig.imageBaseUrl}$rawImage'
+            : '${ApiConfig.imageBaseUrl}default-image.png';
     return ProductModel(
       id:
-          json['id'] != null
-              ? (json['id'] is int
-                  ? json['id']
-                  : int.tryParse(json['id'].toString()) ?? 0)
-              : 0,
+          json['id'] is int
+              ? json['id']
+              : int.tryParse(json['id'].toString()) ?? 0,
       name: json['name'] ?? '',
-      image:
-          json['image'] != null && json['image'] != ''
-              ? 'http://go-lapak.nekolympus.my.id/storage/${json['image']}'
-              : 'http://go-lapak.nekolympus.my.id/storage/default-image.png',
+      image: imageUrl,
       mainCost:
-          json['main_cost'] != null
-              ? (json['main_cost'] is num
-                  ? (json['main_cost'] as num).toDouble()
-                  : double.tryParse(json['main_cost'].toString()) ?? 0.0)
-              : 0.0,
+          json['main_cost'] is num
+              ? (json['main_cost'] as num).toDouble()
+              : double.tryParse(json['main_cost'].toString()) ?? 0.0,
     );
   }
 }

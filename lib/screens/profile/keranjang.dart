@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../components/button.dart';
 import '../../components/card_cartproduct.dart';
 import '../../providers/cart_provider.dart';
-import '../../providers/address_provider.dart';
+import '../../providers/address_provider.dart'; // Pastikan nama file dan class sesuai, saya asumsikan 'AlamatProvider'
 import '../create_order.dart';
 import '../select_address.dart';
 import '../../components/alertdialog.dart';
+import '../../services/user_service.dart';
 import '../../theme/colors.dart';
 
 Future<void> showCustomAlertDialog({
@@ -58,6 +60,8 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  bool isLoading = false; // Pindahkan ke level state agar setState efektif
+
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
@@ -100,6 +104,7 @@ class _CartScreenState extends State<CartScreen> {
                           final item = cartItems[index];
                           final formattedPrice =
                               'Rp. ${formatPrice(item.price)}';
+
                           return CardProduct(
                             title: item.title,
                             price: formattedPrice,
@@ -196,54 +201,77 @@ class _CartScreenState extends State<CartScreen> {
               top: false,
               child: CustomButton(
                 text: 'BUAT PESANAN',
-                onPressed: () async {
-                  final now = DateTime.now();
-                  final bukaJam = 9;
-                  final tutupJam = 21;
+                isLoading: isLoading,
+                onPressed:
+                    isLoading
+                        ? null
+                        : () async {
+                          setState(() => isLoading = true);
 
-                  if (now.hour < bukaJam || now.hour >= tutupJam) {
-                    await showCustomAlertDialog(
-                      context: context,
-                      title: 'Tutup',
-                      message:
-                          'Pesanan hanya bisa dibuat antara jam 09:00 pagi hingga 21:00 malam.',
-                      confirmText: 'OK',
-                      onConfirm: () {},
-                    );
-                    return;
-                  }
+                          try {
+                            final status = await fetchStatusToko();
 
-                  if (cartItems.isEmpty) {
-                    await showCustomAlertDialog(
-                      context: context,
-                      title: 'Keranjang Kosong',
-                      message:
-                          'Silakan tambahkan produk terlebih dahulu sebelum membuat pesanan.',
-                      confirmText: 'OK',
-                      onConfirm: () {},
-                    );
-                    return;
-                  }
+                            if (!status['isOpen']) {
+                              await showCustomAlertDialog(
+                                context: context,
+                                title: 'Toko Tutup',
+                                message:
+                                    status['status'] ??
+                                    'Toko saat ini sedang tutup.',
+                                confirmText: 'OK',
+                                onConfirm: () {},
+                              );
+                              setState(() => isLoading = false);
+                              return;
+                            }
+                          } catch (e) {
+                            await showCustomAlertDialog(
+                              context: context,
+                              title: 'Gagal Cek Status',
+                              message:
+                                  'Tidak dapat mengecek status toko. Silakan coba lagi.',
+                              confirmText: 'OK',
+                              onConfirm: () {},
+                            );
+                            setState(() => isLoading = false);
+                            return;
+                          }
 
-                  if (selectedAlamat == null) {
-                    await showCustomAlertDialog(
-                      context: context,
-                      title: 'Pilih Alamat',
-                      message:
-                          'Pilih alamat terlebih dahulu sebelum melanjutkan.',
-                      confirmText: 'OK',
-                      onConfirm: () {},
-                    );
-                    return;
-                  }
+                          if (cartItems.isEmpty) {
+                            await showCustomAlertDialog(
+                              context: context,
+                              title: 'Keranjang Kosong',
+                              message:
+                                  'Silakan tambahkan produk terlebih dahulu sebelum membuat pesanan.',
+                              confirmText: 'OK',
+                              onConfirm: () {},
+                            );
+                            setState(() => isLoading = false);
+                            return;
+                          }
 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CreateOrderScreen(),
-                    ),
-                  );
-                },
+                          if (selectedAlamat == null) {
+                            await showCustomAlertDialog(
+                              context: context,
+                              title: 'Pilih Alamat',
+                              message:
+                                  'Pilih alamat terlebih dahulu sebelum melanjutkan.',
+                              confirmText: 'OK',
+                              onConfirm: () {},
+                            );
+                            setState(() => isLoading = false);
+                            return;
+                          }
+
+                          setState(() => isLoading = false);
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const CreateOrderScreen(),
+                            ),
+                          );
+                        },
               ),
             ),
           ],

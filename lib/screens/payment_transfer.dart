@@ -169,10 +169,10 @@ class PaymentTransferScreen extends StatelessWidget {
                     confirmText: 'Ya',
                     cancelText: 'Batal',
                     onConfirm: () {
-                      Navigator.of(context).pop(); // tutup dialog
+                      Navigator.of(context).pop(); 
                       Navigator.of(
                         context,
-                      ).pop(); // kembali ke layar sebelumnya
+                      ).pop(); 
                     },
                     onCancel: () => Navigator.of(context).pop(),
                   );
