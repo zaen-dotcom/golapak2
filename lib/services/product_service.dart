@@ -25,14 +25,14 @@ Future<List<ProductModel>> _fetchProduk(String endpoint) async {
       Uri.parse(url),
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json', // penting!
+        'Accept': 'application/json',
         'Authorization': 'Bearer $token',
       },
     );
 
     if (response.statusCode == 200) {
       if (response.body.startsWith('<!DOCTYPE html>')) {
-        throw Exception('401'); // respons HTML, berarti token salah
+        throw Exception('401'); 
       }
 
       final decoded = json.decode(response.body);

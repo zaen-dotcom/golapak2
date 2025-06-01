@@ -78,14 +78,6 @@ Future<TransactionSummary?> calculateTransaction(
   final body = {'menu': menuList};
   final encodedBody = jsonEncode(body);
 
-  print('--- REQUEST TRANSACTION CALCULATE ---');
-  print('URL: $url');
-  print(
-    'Headers: {Accept: application/json, Authorization: Bearer $token, Content-Type: application/json}',
-  );
-  print('Body: $encodedBody');
-  print('------------------------------------');
-
   try {
     final response = await http.post(
       url,
@@ -96,11 +88,6 @@ Future<TransactionSummary?> calculateTransaction(
       },
       body: encodedBody,
     );
-
-    print('--- RESPONSE TRANSACTION CALCULATE ---');
-    print('Status Code: ${response.statusCode}');
-    print('Body: ${response.body}');
-    print('-------------------------------------');
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);

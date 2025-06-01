@@ -369,6 +369,27 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                   : () async {
                     setState(() => isLoading = true);
 
+                    // Validasi: jika transfer tapi belum pilih metode transfer
+                    if (_paymentMethod == 'Transfer' &&
+                        (selectedBank == null || selectedBank!.isEmpty)) {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder:
+                            (_) => CustomAlert(
+                              title: 'Pilih Metode Transfer',
+                              message:
+                                  'Silakan pilih metode transfer terlebih dahulu sebelum konfirmasi pesanan.',
+                              confirmText: 'OK',
+                              onConfirm: () {
+                                Navigator.of(context).pop();
+                                setState(() => isLoading = false);
+                              },
+                            ),
+                      );
+                      return; // Jangan lanjutkan pemesanan
+                    }
+
                     final cartItems = _cartProvider.items.values.toList();
                     final menuList =
                         cartItems
@@ -394,9 +415,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                               confirmText: 'OK',
                               onConfirm: () {
                                 Navigator.of(context).pop();
-                                setState(
-                                  () => isLoading = false,
-                                ); 
+                                setState(() => isLoading = false);
                               },
                             ),
                       );
@@ -446,9 +465,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                                         ),
                                   ),
                                 );
-                                setState(
-                                  () => isLoading = false,
-                                ); 
+                                setState(() => isLoading = false);
                               },
                             ),
                       );
@@ -465,9 +482,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                               confirmText: 'Tutup',
                               onConfirm: () {
                                 Navigator.of(context).pop();
-                                setState(
-                                  () => isLoading = false,
-                                ); 
+                                setState(() => isLoading = false);
                               },
                             ),
                       );
